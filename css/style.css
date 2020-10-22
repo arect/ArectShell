@@ -1,19 +1,7 @@
-@font-face {
-    font-family: Cascadia Mono Light;
-    font-style: light;
-    src: url('../fonts/CascadiaMono-Light.ttf') format('truetype'),
-         url('../fonts/CascadiaMono-Light.woff2') format('woff2'),
-         url('../fonts/CascadiaMono-Light.otf') format('otf');
-    src: local("Cascadia Mono Light");
-}
-@font-face {
-    font-family: Space Mono Regular;
-    src: url('../fonts/SpaceMono-Regular.ttf') format('truetype');
-}
 body {
     padding: 0;
     margin: 0;
-    font-family: 'Cascadia Mono Light', 'Oxygen Mono', monospace, Space Mono Regular;
+    font-family: 'Cascadia Mono Light', 'Oxygen Mono', monospace, Consolas;
 }
 .aboutMe {
     padding-top: 12px;
