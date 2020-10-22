@@ -41,7 +41,7 @@
         <div class = "commandMain">
             <div id = "commandInput" spellcheck = "false" autocomplete = "off" autocorrect = "off">
                 <span id = "prompt">
-                    [{{ username }}@{{ device }} {{ directory }}] {{ authority }}
+                    {{ toString_() }}
                 </span>
                 <span
                     contenteditable = "true"
@@ -62,12 +62,49 @@
             data: {
                 username: 'visitor',
                 device: 'kanofans_com',
-                directory: '~',
+                directory: ["~"],
                 authority: '$',
             },
             methods: {
                 toString_: function() {
-                    return this.toString = '[' + this.username + '@' + this.device + ' ' + this.directory + '] ' + this.authority;
+                    return this.toString = '[' + this.username + '@' + this.device + ' ' + this.directory[this.directory.length - 1] + '] ' + this.authority;
+                },
+                getFullLocation: function() {
+                    var temp = "~";
+                    for (let index = 1; index < this.directory.length; index++) {
+                        temp += "/" + this.directory[index];
+                    }
+                    return temp;
+                },
+                getNowLocation: function() {
+                    return this.directory[this.directory.length - 1];
+                },
+                getTargetLocation: function(str) {
+                    var t = str.split("/");
+                    var temp = this.getFullLocation().split("/");
+                    for (let index = 0; index < t.length; index++) {
+                        switch (t[index]) {
+                            case ".": {
+                                break;
+                            }
+                            case "..": {
+                                temp.pop();
+                                break;
+                            }
+                            default: {
+                                temp.push(t[index]);
+                                break;
+                            }
+                        }
+                    }
+                    var temp1 = "~";
+                    for (let index = 1; index < temp.length; index++) {
+                        temp1 += "/" + temp[index];
+                    }
+                    return temp1;
+                },
+                getEnterTarget: function(str) {
+                    var t = str.split("/");
                 }
             }
         })
@@ -91,15 +128,19 @@
                     commandHistory.prompts.push({prompt: prompt.toString_()});
                     commandHistory.commands.push({command: this.$refs.command.innerText});
                     switch (command[0]) {
-                        case "ls":{
-                            c_ls.ls(command);
+                        case "ls": {
+                            commandHistory.results.push({result: c_ls.ls(command)});
                             break;
                         }
-                        case "":{
+                        case "cd": {
+                            commandHistory.results.push({result: c_cd.cd(command)});
+                            break;
+                        }
+                        case "": {
                             commandHistory.results.push({result: ""});
                             break;
                         }
-                        default:{
+                        default: {
                             commandHistory.results.push({result: "-ArectShell: command not found: " + command[0]});
                             break;
                         }  
@@ -115,7 +156,7 @@
         })
         var d_files = new Vue({
             data: {
-                index: ["~", "~", "testdir"],
+                index: ["~", "~", "~/testdir"],
                 dirs: ["$NULL$", "testdir", "$NULL$"],
                 files: ["test.txt", "$NULL$", "test.txt"],
             }
@@ -123,10 +164,9 @@
         var c_ls = new Vue({
             methods: {
                 ls: function(arr) {
+                    var resultTemp = "";
                     if (arr.length == 1 || arr.length == 2) {
-                        var targetDir = arr.length == 1 ? prompt.directory : arr[1];
-                        console.log(targetDir);
-                        var resultTemp = "";
+                        var targetDir = arr.length == 1 ? prompt.getFullLocation() : prompt.getTargetLocation(arr[1]);
                         for (let index = 0; index < d_files.index.length; index++) {
                             if (d_files.index[index] == targetDir) {
                                 if (d_files.dirs[index] != "$NULL$") {
@@ -137,17 +177,15 @@
                                 resultTemp += "&ensp;&ensp;";
                             }
                         }
-                        if (resultTemp == "") {
-                            resultTemp += "ls: cannot access \'" + targetDir + "\': No such file or directory";
+                        if (resultTemp == "" && arr.length == 2) {
+                            resultTemp += "ls: cannot access \'" + arr[1] + "\': No such file or directory";
                         }
-                        commandHistory.results.push({result: resultTemp});
                     }
                     else {
-                        var resultTemp = "";
                         for (let i = 1; i < arr.length; i++) {
                             var isValid = false;
                             for (let index = 0; index < d_files.index.length; index++) {
-                                if (d_files.index[index] == arr[i]) {
+                                if (d_files.index[index] == prompt.getTargetLocation(arr[1])) {
                                     if (!isValid) {
                                         resultTemp += arr[i] + ": <br />&ensp;&ensp;";
                                     }
@@ -165,9 +203,44 @@
                             }
                             resultTemp += "<br />";
                         }
-                        commandHistory.results.push({result: resultTemp});
                     }
-                    
+                    return resultTemp;
+                }
+            }
+        })
+        var c_cd = new Vue({
+            methods: {
+                cd: function(arr) {
+                    switch (arr.length) {
+                        case 1: {
+                            return "";
+                        }
+                        case 2: {
+                            if (arr[1] == "~") {
+                                prompt.directory.splice(1, prompt.directory.length);
+                                return "";
+                            }
+                            if (arr[1] == "..") {
+                                prompt.directory.pop();
+                                return "";
+                            }
+                            if (arr[1] == ".") {
+                                return "";
+                            }
+                            var dirs = arr[1].split("/");
+                            var targetDir = prompt.getTargetLocation(dirs[1]);
+                            for (let index = 0; index < d_files.index.length; index++) {
+                                if (d_files.index[index] == targetDir) {
+                                    
+                                }
+                            }
+                            return "cd: no such file or directory: " + arr[1];
+                        }
+                        default:{
+                            return "cd: string not in pwd: " + arr[1];
+                            break;
+                        }
+                    }
                 }
             }
         })
