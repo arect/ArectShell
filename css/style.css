@@ -1,1 +1,72 @@
-
+@font-face {
+    font-family: Cascadia Mono Light;
+    font-style: light;
+    src: url('../fonts/CascadiaMono-Light.ttf') format('truetype'),
+         url('../fonts/CascadiaMono-Light.woff2') format('woff2'),
+         url('../fonts/CascadiaMono-Light.otf') format('otf');
+    src: local("Cascadia Mono Light");
+}
+@font-face {
+    font-family: Space Mono Regular;
+    src: url('../fonts/SpaceMono-Regular.ttf') format('truetype');
+}
+body {
+    padding: 0;
+    margin: 0;
+    font-family: 'Cascadia Mono Light', 'Oxygen Mono', monospace, Space Mono Regular;
+}
+.aboutMe {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    padding-left: 6px;
+    padding-right: 6px;
+}
+.introduce {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    padding-left: 6px;
+    padding-right: 6px;
+    color: grey;
+}
+.commandMain {
+    padding-left: 6px;
+    padding-right: 6px;
+    height: 100%;
+}
+.commandInput {
+    font-size: 16px;
+}
+.commandInput:before{
+    color: #BBBBBB;
+    content: "input here";
+}
+.commandFocus {
+    padding-right: 1px!important;
+    word-break: break-all;
+}
+.commandFocus:focus {
+    border: none;
+    outline: none;
+}
+.commandHistory {
+    padding-left: 6px;
+    padding-right: 6px;
+}
+.commandHistoryItem {
+    padding-bottom: 10px;
+}
+a {
+    color: grey;
+    text-decoration: underline dotted grey;
+}
+a:visited {
+    color:grey;
+    text-decoration: underline dotted grey;
+}
+a:hover {
+    color: black;
+    text-decoration: underline dotted black;
+}
+.ls_dir {
+    color: #2196F3;
+}
