@@ -1,0 +1,175 @@
+<html>
+    <head>
+        <meta
+            name = "viewport"
+            content = "width = device-width, initial-scale = 1.0, maximum-scale = 1.0, user-scalable = no"
+        >
+        <link
+            rel = "stylesheet"
+            type = "text/css"
+            href = "./css/style.css"
+        >
+        <link href="https://fonts.font.im/css?family=Oxygen+Mono" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <title>ArectShell</title>
+    </head>
+    <body>
+        <header>
+            <div class = "aboutMe">
+                Hi~ <br />
+                This page was inspired by <a href = "https://axton.cc" target = "_blank">axton</a>.<br />
+                <span style = "color: #F44336;">
+                    Known issue: Sometimes the cursor does not appear when clicking "input here".
+                </span><br />
+                Current progress: no backend.
+            </div>
+            <div class = "introduce">
+                Arect Shell v0.1
+            </div>
+        </header>
+        <div class = "commandHistory" id = "commandHistory">
+            <div v-for = "(item, index) in prompts" class = "commandHistoryItem">
+                {{ item.prompt }} {{ commands[index].command }}<br />
+                <div v-if = "commands[index].command != ''">
+                    <span v-if = "results[index].result == '\n'">
+                        <br />
+                    </span>
+                    <div v-html = "results[index].result" v-else></div>
+                </div>
+            </div>
+        </div>
+        <div class = "commandMain">
+            <div id = "commandInput" spellcheck = "false" autocomplete = "off" autocorrect = "off">
+                <span id = "prompt">
+                    [{{ username }}@{{ device }} {{ directory }}] {{ authority }}
+                </span>
+                <span
+                    contenteditable = "true"
+                    id = "inputCommand"
+                    v-bind:class = "{ commandInput: !isFocused, commandFocus: isFocused }"
+                    v-on:focus = "inputFocus(true)"
+                    v-on:blur = "inputFocus(false)"
+                    v-on:keydown.enter = "exec()"
+                    ref = "command"
+                >
+                </span>
+            </div>
+        </div>
+    </body>
+    <script>
+        var prompt = new Vue ({
+            el: "#prompt",
+            data: {
+                username: 'visitor',
+                device: 'kanofans_com',
+                directory: '~',
+                authority: '$',
+            },
+            methods: {
+                toString_: function() {
+                    return this.toString = '[' + this.username + '@' + this.device + ' ' + this.directory + '] ' + this.authority;
+                }
+            }
+        })
+        var commandHistory = new Vue ({
+            el: "#commandHistory",
+            data: {
+                prompts: [],
+                commands: [],
+                results: [],
+            }
+        })
+        var inputCommand = new Vue ({
+            el: "#inputCommand",
+            data: {
+                isFocused: false,
+            },
+            methods: {
+                exec: function() {
+                    event.preventDefault();
+                    var command = this.$refs.command.innerText.trim().split(/\s+/);
+                    commandHistory.prompts.push({prompt: prompt.toString_()});
+                    commandHistory.commands.push({command: this.$refs.command.innerText});
+                    switch (command[0]) {
+                        case "ls":{
+                            c_ls.ls(command);
+                            break;
+                        }
+                        case "":{
+                            commandHistory.results.push({result: ""});
+                            break;
+                        }
+                        default:{
+                            commandHistory.results.push({result: "-ArectShell: command not found: " + command[0]});
+                            break;
+                        }  
+                    }
+                    this.$refs.command.innerHTML = "";
+                },
+                inputFocus: function(b) {
+                    if(this.$refs.command.innerText == ''){
+                        this.isFocused = b;
+                    }
+                }
+            }
+        })
+        var d_files = new Vue({
+            data: {
+                index: ["~", "~", "testdir"],
+                dirs: ["$NULL$", "testdir", "$NULL$"],
+                files: ["test.txt", "$NULL$", "test.txt"],
+            }
+        })
+        var c_ls = new Vue({
+            methods: {
+                ls: function(arr) {
+                    if (arr.length == 1 || arr.length == 2) {
+                        var targetDir = arr.length == 1 ? prompt.directory : arr[1];
+                        console.log(targetDir);
+                        var resultTemp = "";
+                        for (let index = 0; index < d_files.index.length; index++) {
+                            if (d_files.index[index] == targetDir) {
+                                if (d_files.dirs[index] != "$NULL$") {
+                                    resultTemp += "<span class = \"ls_dir\">" + d_files.dirs[index] + "</span>";
+                                }else if (d_files.files[index] != "$NULL$") {
+                                    resultTemp += d_files.files[index];
+                                }
+                                resultTemp += "&ensp;&ensp;";
+                            }
+                        }
+                        if (resultTemp == "") {
+                            resultTemp += "ls: cannot access \'" + targetDir + "\': No such file or directory";
+                        }
+                        commandHistory.results.push({result: resultTemp});
+                    }
+                    else {
+                        var resultTemp = "";
+                        for (let i = 1; i < arr.length; i++) {
+                            var isValid = false;
+                            for (let index = 0; index < d_files.index.length; index++) {
+                                if (d_files.index[index] == arr[i]) {
+                                    if (!isValid) {
+                                        resultTemp += arr[i] + ": <br />&ensp;&ensp;";
+                                    }
+                                    isValid = true;
+                                    if (d_files.dirs[index] != "$NULL$") {
+                                        resultTemp += "<span class = \"ls_dir\">" + d_files.dirs[index] + "</span>";
+                                    }else if (d_files.files[index] != "$NULL$") {
+                                        resultTemp += d_files.files[index];
+                                    }
+                                    resultTemp += "&ensp;&ensp;";
+                                }
+                            }
+                            if (!isValid) {
+                                resultTemp += "ls: cannot access \'" + arr[i] + "\': No such file or directory";
+                            }
+                            resultTemp += "<br />";
+                        }
+                        commandHistory.results.push({result: resultTemp});
+                    }
+                    
+                }
+            }
+        })
+    </script>
+</html>
