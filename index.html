@@ -20,23 +20,25 @@
                 This page was inspired by <a href = "https://axton.cc" target = "_blank">axton</a>.<br />
                 <span style = "color: #F44336;">
                     Known issue: 1. Sometimes the cursor does not appear when clicking "input here".
+                    <br />
                     &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;
                     2. Input HTML tags will be displayed.
-                </span><br />
+                </span>
+                <br />
                 Current progress: no backend.
             </div>
             <div class = "introduce">
-                Arect Shell v0.1
+                Arect Shell v0.2.1
             </div>
         </header>
         <div class = "commandHistory" id = "commandHistory">
             <div v-for = "(item, index) in prompts" class = "commandHistoryItem">
                 {{ item.prompt }} {{ commands[index].command }}<br />
-                <div v-if = "commands[index].command != ''">
-                    <span v-if = "results[index].result == '\n'">
-                        <br />
-                    </span>
-                    <div v-html = "results[index].result" v-else></div>
+                <div v-if = "isHtml[index] == true">
+                    <div v-html = "results[index].result" v-if = "commands[index].command != ''"></div>
+                </div>
+                <div v-else>
+                    {{ results[index].result }}
                 </div>
             </div>
         </div>
@@ -220,6 +222,7 @@
             data: {
                 prompts: [],
                 commands: [],
+                isHtml: [],
                 results: [],
             }
         })
@@ -230,6 +233,7 @@
             },
             methods: {
                 exec: function() {
+                    console.log(commandHistory.isHtml);
                     event.preventDefault();
                     let command = this.$refs.command.innerText.trim().split(/\s+/);
                     commandHistory.prompts.push({prompt: prompt.toString_()});
@@ -306,17 +310,24 @@
                                     result += i.name + "&ensp;&ensp;";
                                 }
                             }
+                            if (result == "") {
+                                result += "<br />";
+                            }
+                            commandHistory.isHtml.push(true);
                             return result;
                         }
                         case 2: {
                             let temp = prompt.enterTargetDir(arr[1]);
                             if (Object.prototype.toString.call(temp) == "[object String]") {
                                 if (temp == "ERR_PERMISSION_DENIED") {
+                                    commandHistory.isHtml.push(false);
                                     return "ls: cannot open directory \'" + arr[1] + "\': Permission denied";
                                 }
-                                return "ls: no such file or directory:&ensp;" + arr[1];
+                                commandHistory.isHtml.push(false);
+                                return "ls: no such file or directory: " + arr[1];
                             }
                             if (!temp.isDir) {
+                                commandHistory.isHtml.push(true);
                                 return temp.name;
                             }
                             for (let i of temp.content) {
@@ -327,13 +338,16 @@
                                     result += i.name + "&ensp;&ensp;";
                                 }
                             }
+                            commandHistory.isHtml.push(true);
                             return result;
                         }
                         default: {
+                            commandHistory.isHtml.push(true);
                             return "Now unavailable"
                             break;
                         }
                     }
+                    commandHistory.isHtml.push(true);
                     return "";
                 }
             }
@@ -344,18 +358,23 @@
                     let result = "";
                     switch (arr.length) {
                         case 1: {
+                            commandHistory.isHtml.push(true);
                             return "";
                         }
                         case 2: {
                             let temp = prompt.enterTargetDir(arr[1]);
                             if (Object.prototype.toString.call(temp) == "[object String]") {
-                                d_text.message = arr[1];
-                                return "cd: no such file or directory:&ensp;" + arr[1];
+                                commandHistory.isHtml.push(false);
+                                if (temp == "ERR_PERMISSION_DENIED") {
+                                    return "cd: permission denied: " + arr[1];
+                                }
+                                return "cd: no such file or directory: " + arr[1];
                             }
                             if (!temp.isDir) {
-                                return "cd: not a directory:&ensp;" + arr[1];
+                                commandHistory.isHtml.push(false);
+                                return "cd: not a directory: " + arr[1];
                             }
-                            let target = arr[1].trim('/').split("/");
+                            let target = arr[1].replace(new RegExp('^\\/+|\\/+$', 'g'), '').split("/");
                             if (target[0] == "~") {
                                 prompt.directory.splice(0,prompt.directory.length);
                             }
@@ -369,13 +388,16 @@
                                 }
                                 prompt.directory.push(i);
                             }
+                            commandHistory.isHtml.push(true);
                             return "";
                         }
                         default: {
-                            return "cd: string not in pwd:&ensp;" + arr[1];
+                            commandHistory.isHtml.push(false);
+                            return "cd: string not in pwd: " + arr[1];
                             break;
                         }
                     }
+                    commandHistory.isHtml.push(true);
                     return "";
                 }
             }
@@ -386,6 +408,7 @@
                     commandHistory.prompts.splice(0,commandHistory.prompts.length);
                     commandHistory.commands.splice(0,commandHistory.commands.length);
                     commandHistory.results.splice(0,commandHistory.results.length);
+                    commandHistory.isHtml.push(true);
                     return "";
                 }
             }
@@ -394,6 +417,8 @@
             methods: {
                 shutdown: function(arr) {
                     window.location.href = "about:blank";
+                    commandHistory.isHtml.push(true);
+                    return "";
                 }
             }
         })
