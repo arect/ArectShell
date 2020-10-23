@@ -19,7 +19,9 @@
                 Hi~ <br />
                 This page was inspired by <a href = "https://axton.cc" target = "_blank">axton</a>.<br />
                 <span style = "color: #F44336;">
-                    Known issue: Sometimes the cursor does not appear when clicking "input here".
+                    Known issue: 1. Sometimes the cursor does not appear when clicking "input here".
+                    &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;
+                    2. Input HTML tags will be displayed.
                 </span><br />
                 Current progress: no backend.
             </div>
@@ -70,41 +72,146 @@
                     return this.toString = '[' + this.username + '@' + this.device + ' ' + this.directory[this.directory.length - 1] + '] ' + this.authority;
                 },
                 getFullLocation: function() {
-                    var temp = "~";
+                    let temp = "~";
                     for (let index = 1; index < this.directory.length; index++) {
                         temp += "/" + this.directory[index];
                     }
                     return temp;
                 },
-                getNowLocation: function() {
-                    return this.directory[this.directory.length - 1];
+                getCurrentLocation: function() {
+                    let temp = d_fileTree.fileTree;
+                    for (let i of temp) {
+                        if (i.owner = this.username) {
+                            temp = i;
+                            for (let ii = 1; ii < this.directory.length; ii++) {
+                                let isFound = false;
+                                for (let iii of temp.content) {
+                                    if (iii.name == this.directory[ii]) {
+                                        isFound = true;
+                                        temp = iii;
+                                        break;
+                                    }
+                                }
+                                if (!isFound) {
+                                    return "ERR_NO_SUCH_DIR_OR_FILE";
+                                }
+                            }
+                            return temp;
+                        }
+                    }
+                    return temp;
                 },
-                getTargetLocation: function(str) {
-                    var t = str.split("/");
-                    var temp = this.getFullLocation().split("/");
-                    for (let index = 0; index < t.length; index++) {
-                        switch (t[index]) {
-                            case ".": {
-                                break;
-                            }
-                            case "..": {
-                                temp.pop();
-                                break;
-                            }
-                            default: {
-                                temp.push(t[index]);
-                                break;
+                findFather: function(child) {
+                    let list = [];
+                    for (let i of d_fileTree.fileTree) {
+                        if (child === i) {
+                            return "ERR_PERMISSION_DENIED";
+                        }
+                        if (i.isDir) {
+                            list.push(i);
+                        }
+                    }
+                    while (list.length > 0) {
+                        let temp = list.shift();
+                        if (temp.isDir) {
+                            for (let i of temp.content) {
+                                if (i === child) {
+                                    return temp;
+                                }
+                                if (i.isDir) {
+                                    list.push(i);
+                                }
                             }
                         }
                     }
-                    var temp1 = "~";
-                    for (let index = 1; index < temp.length; index++) {
-                        temp1 += "/" + temp[index];
-                    }
-                    return temp1;
                 },
-                getEnterTarget: function(str) {
-                    var t = str.split("/");
+                getUserDir: function() {
+                    for (let i of d_fileTree.fileTree) {
+                        if (i.owner == this.username) {
+                            return i;
+                        }
+                    }
+                    return "ERR_IN_FINDING_USER_DIR";
+                },
+                enterTargetDir: function(arr) {
+                    if (Object.prototype.toString.call(arr) == "[object String]") {
+                        arr = arr.trim().replace(new RegExp('^\\/+|\\/+$', 'g'), '').split("/");
+                    }
+                    if (Object.prototype.toString.call(arr) != "[object Array]") {
+                        console.log("ERR_PARAMETER_TYPE_ERROR");
+                        return "ERR_NO_SUCH_DIR_OR_FILE";
+                    }
+                    // 相对路径
+                    let temp = this.getCurrentLocation();
+                    let isFound = false;
+                    for (let i of arr) {
+                        isFound = false;
+                        if (i == ".") {
+                            isFound = true;
+                            continue;
+                        }
+                        if (i == "..") {
+                            temp = this.findFather(temp);
+                            if (Object.prototype.toString.call(temp) == "[object String]") {
+                                return temp;
+                            }
+                            isFound = true;
+                            continue;
+                        }
+                        for (let ii of temp.content) {
+                            if (i == ii.name) {
+                                isFound = true;
+                                temp = ii;
+                                break;
+                            }
+                        }
+                        if (!isFound) {
+                            break;
+                        }
+                    }
+                    if (isFound) {
+                        return temp;
+                    }
+                    else {
+                        if (arr[0] == "~") {
+                            isFound = true;
+                            arr.shift();
+                        } else return "ERR_NO_SUCH_DIR_OR_FILE";
+                        temp = this.getUserDir();
+                        if (temp == "ERR_IN_FINDING_USER_DIR") {
+                            console.log(temp);
+                            return "ERR_IN_FINDING_USER_DIR";
+                        }
+                        for (let i of arr) {
+                            isFound = false;
+                            if (i == ".") {
+                                isFound = true;
+                                continue;
+                            }
+                            if (i == "..") {
+                                temp = this.findFather(temp);
+                                if (Object.prototype.toString.call(temp) == "[object String]") {
+                                    return temp;
+                                }
+                                isFound = true;
+                                continue;
+                            }
+                            for (let ii of temp.content) {
+                                if (i == ii.name) {
+                                    isFound = true;
+                                    temp = ii;
+                                    break;
+                                }
+                            }
+                            if (!isFound) {
+                                break;
+                            }
+                        }
+                        if (isFound) {
+                            return temp;
+                        }
+                    }
+                    return "ERR_NO_SUCH_DIR_OR_FILE";
                 }
             }
         })
@@ -124,7 +231,7 @@
             methods: {
                 exec: function() {
                     event.preventDefault();
-                    var command = this.$refs.command.innerText.trim().split(/\s+/);
+                    let command = this.$refs.command.innerText.trim().split(/\s+/);
                     commandHistory.prompts.push({prompt: prompt.toString_()});
                     commandHistory.commands.push({command: this.$refs.command.innerText});
                     switch (command[0]) {
@@ -134,6 +241,14 @@
                         }
                         case "cd": {
                             commandHistory.results.push({result: c_cd.cd(command)});
+                            break;
+                        }
+                        case "clear": {
+                            c_clear.clear();
+                            break;
+                        }
+                        case "shutdown": {
+                            commandHistory.results.push({result: c_shutdown.shutdown(command)});
                             break;
                         }
                         case "": {
@@ -154,93 +269,131 @@
                 }
             }
         })
-        var d_files = new Vue({
+        var d_fileTree = new Vue({
             data: {
-                index: ["~", "~", "~/testdir"],
-                dirs: ["$NULL$", "testdir", "$NULL$"],
-                files: ["test.txt", "$NULL$", "test.txt"],
+                fileTree: [{
+                    name: "~",
+                    owner: "visitor",
+                    isDir: true,
+                    content: [{
+                        name: "testdir",
+                        isDir: true,
+                        content: [{
+                            name: "second.file",
+                            isDir: false,
+                            content: []
+                        }]
+                    },{
+                        name: "test.txt",
+                        isDir: false,
+                        content: []
+                    }]
+                }]
             }
         })
         var c_ls = new Vue({
             methods: {
                 ls: function(arr) {
-                    var resultTemp = "";
-                    if (arr.length == 1 || arr.length == 2) {
-                        var targetDir = arr.length == 1 ? prompt.getFullLocation() : prompt.getTargetLocation(arr[1]);
-                        for (let index = 0; index < d_files.index.length; index++) {
-                            if (d_files.index[index] == targetDir) {
-                                if (d_files.dirs[index] != "$NULL$") {
-                                    resultTemp += "<span class = \"ls_dir\">" + d_files.dirs[index] + "</span>";
-                                }else if (d_files.files[index] != "$NULL$") {
-                                    resultTemp += d_files.files[index];
+                    let result = "";
+                    switch (arr.length) {
+                        case 1: {
+                            let temp = prompt.getCurrentLocation();
+                            for (let i of temp.content) {
+                                if (i.isDir == true) {
+                                    result += "<span class = \"ls_dir\">" + i.name + "</span>&ensp;&ensp;";
                                 }
-                                resultTemp += "&ensp;&ensp;";
-                            }
-                        }
-                        if (resultTemp == "" && arr.length == 2) {
-                            resultTemp += "ls: cannot access \'" + arr[1] + "\': No such file or directory";
-                        }
-                    }
-                    else {
-                        for (let i = 1; i < arr.length; i++) {
-                            var isValid = false;
-                            for (let index = 0; index < d_files.index.length; index++) {
-                                if (d_files.index[index] == prompt.getTargetLocation(arr[1])) {
-                                    if (!isValid) {
-                                        resultTemp += arr[i] + ": <br />&ensp;&ensp;";
-                                    }
-                                    isValid = true;
-                                    if (d_files.dirs[index] != "$NULL$") {
-                                        resultTemp += "<span class = \"ls_dir\">" + d_files.dirs[index] + "</span>";
-                                    }else if (d_files.files[index] != "$NULL$") {
-                                        resultTemp += d_files.files[index];
-                                    }
-                                    resultTemp += "&ensp;&ensp;";
+                                else {
+                                    result += i.name + "&ensp;&ensp;";
                                 }
                             }
-                            if (!isValid) {
-                                resultTemp += "ls: cannot access \'" + arr[i] + "\': No such file or directory";
+                            return result;
+                        }
+                        case 2: {
+                            let temp = prompt.enterTargetDir(arr[1]);
+                            if (Object.prototype.toString.call(temp) == "[object String]") {
+                                if (temp == "ERR_PERMISSION_DENIED") {
+                                    return "ls: cannot open directory \'" + arr[1] + "\': Permission denied";
+                                }
+                                return "ls: no such file or directory:&ensp;" + arr[1];
                             }
-                            resultTemp += "<br />";
+                            if (!temp.isDir) {
+                                return temp.name;
+                            }
+                            for (let i of temp.content) {
+                                if (i.isDir == true) {
+                                    result += "<span class = \"ls_dir\">" + i.name + "</span>&ensp;&ensp;";
+                                }
+                                else {
+                                    result += i.name + "&ensp;&ensp;";
+                                }
+                            }
+                            return result;
+                        }
+                        default: {
+                            return "Now unavailable"
+                            break;
                         }
                     }
-                    return resultTemp;
+                    return "";
                 }
             }
         })
         var c_cd = new Vue({
             methods: {
                 cd: function(arr) {
+                    let result = "";
                     switch (arr.length) {
                         case 1: {
                             return "";
                         }
                         case 2: {
-                            if (arr[1] == "~") {
-                                prompt.directory.splice(1, prompt.directory.length);
-                                return "";
+                            let temp = prompt.enterTargetDir(arr[1]);
+                            if (Object.prototype.toString.call(temp) == "[object String]") {
+                                d_text.message = arr[1];
+                                return "cd: no such file or directory:&ensp;" + arr[1];
                             }
-                            if (arr[1] == "..") {
-                                prompt.directory.pop();
-                                return "";
+                            if (!temp.isDir) {
+                                return "cd: not a directory:&ensp;" + arr[1];
                             }
-                            if (arr[1] == ".") {
-                                return "";
+                            let target = arr[1].trim('/').split("/");
+                            if (target[0] == "~") {
+                                prompt.directory.splice(0,prompt.directory.length);
                             }
-                            var dirs = arr[1].split("/");
-                            var targetDir = prompt.getTargetLocation(dirs[1]);
-                            for (let index = 0; index < d_files.index.length; index++) {
-                                if (d_files.index[index] == targetDir) {
-                                    
+                            for (let i of target) {
+                                if (i == ".") {
+                                    continue;
                                 }
+                                if (i == "..") {
+                                    prompt.directory.pop();
+                                    continue;
+                                }
+                                prompt.directory.push(i);
                             }
-                            return "cd: no such file or directory: " + arr[1];
+                            return "";
                         }
-                        default:{
-                            return "cd: string not in pwd: " + arr[1];
+                        default: {
+                            return "cd: string not in pwd:&ensp;" + arr[1];
                             break;
                         }
                     }
+                    return "";
+                }
+            }
+        })
+        var c_clear = new Vue({
+            methods: {
+                clear: function() {
+                    commandHistory.prompts.splice(0,commandHistory.prompts.length);
+                    commandHistory.commands.splice(0,commandHistory.commands.length);
+                    commandHistory.results.splice(0,commandHistory.results.length);
+                    return "";
+                }
+            }
+        })
+        var c_shutdown = new Vue({
+            methods: {
+                shutdown: function(arr) {
+                    window.location.href = "about:blank";
                 }
             }
         })
