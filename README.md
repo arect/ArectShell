@@ -14,6 +14,8 @@
 |cd||
 |clear||
 |shutdown|只是定向到空白页面|
+|cat||
+|help|例如ls --help或者直接help|
 
 ## 已知问题
 
