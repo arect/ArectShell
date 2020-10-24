@@ -20,26 +20,19 @@
                 This page was inspired by <a href = "https://axton.cc" target = "_blank">axton</a>.<br />
                 <span style = "color: #F44336;">
                     Known issue: 1. Sometimes the cursor does not appear when clicking "input here".
-                    <br />
-                    &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;
-                    2. Input HTML tags will be displayed.
                 </span>
                 <br />
                 Current progress: no backend.
             </div>
             <div class = "introduce">
-                Arect Shell v0.2.1
+                Arect Shell v0.2.2
             </div>
         </header>
         <div class = "commandHistory" id = "commandHistory">
             <div v-for = "(item, index) in prompts" class = "commandHistoryItem">
                 {{ item.prompt }} {{ commands[index].command }}<br />
-                <div v-if = "isHtml[index] == true">
-                    <div v-html = "results[index].result" v-if = "commands[index].command != ''"></div>
-                </div>
-                <div v-else>
-                    {{ results[index].result }}
-                </div>
+                <div v-if = "results[index].isHtml == true" v-html = "results[index].result"></div>
+                <div v-else v-text = "results[index].result"></div>
             </div>
         </div>
         <div class = "commandMain">
@@ -222,7 +215,6 @@
             data: {
                 prompts: [],
                 commands: [],
-                isHtml: [],
                 results: [],
             }
         })
@@ -233,18 +225,17 @@
             },
             methods: {
                 exec: function() {
-                    console.log(commandHistory.isHtml);
                     event.preventDefault();
                     let command = this.$refs.command.innerText.trim().split(/\s+/);
                     commandHistory.prompts.push({prompt: prompt.toString_()});
                     commandHistory.commands.push({command: this.$refs.command.innerText});
                     switch (command[0]) {
                         case "ls": {
-                            commandHistory.results.push({result: c_ls.ls(command)});
+                            commandHistory.results.push(c_ls.ls(command));
                             break;
                         }
                         case "cd": {
-                            commandHistory.results.push({result: c_cd.cd(command)});
+                            commandHistory.results.push(c_cd.cd(command));
                             break;
                         }
                         case "clear": {
@@ -252,15 +243,15 @@
                             break;
                         }
                         case "shutdown": {
-                            commandHistory.results.push({result: c_shutdown.shutdown(command)});
+                            commandHistory.results.push(c_shutdown.shutdown(command));
                             break;
                         }
                         case "": {
-                            commandHistory.results.push({result: ""});
+                            commandHistory.results.push({isHtml: false, result: ""});
                             break;
                         }
                         default: {
-                            commandHistory.results.push({result: "-ArectShell: command not found: " + command[0]});
+                            commandHistory.results.push({isHtml: false, result: "-ArectShell: command not found: " + command[0]});
                             break;
                         }  
                     }
@@ -280,7 +271,7 @@
                     owner: "visitor",
                     isDir: true,
                     content: [{
-                        name: "testdir",
+                        name: "testDir",
                         isDir: true,
                         content: [{
                             name: "second.file",
@@ -313,22 +304,18 @@
                             if (result == "") {
                                 result += "<br />";
                             }
-                            commandHistory.isHtml.push(true);
-                            return result;
+                            return {isHtml: true, result: result};
                         }
                         case 2: {
                             let temp = prompt.enterTargetDir(arr[1]);
                             if (Object.prototype.toString.call(temp) == "[object String]") {
                                 if (temp == "ERR_PERMISSION_DENIED") {
-                                    commandHistory.isHtml.push(false);
-                                    return "ls: cannot open directory \'" + arr[1] + "\': Permission denied";
+                                    return {isHtml: false, result: "ls: cannot open directory \'" + arr[1] + "\': Permission denied"};
                                 }
-                                commandHistory.isHtml.push(false);
-                                return "ls: no such file or directory: " + arr[1];
+                                return {isHtml: false, result: "ls: no such file or directory: " + arr[1]};
                             }
                             if (!temp.isDir) {
-                                commandHistory.isHtml.push(true);
-                                return temp.name;
+                                return {isHtml: true, result: temp.name};
                             }
                             for (let i of temp.content) {
                                 if (i.isDir == true) {
@@ -338,17 +325,14 @@
                                     result += i.name + "&ensp;&ensp;";
                                 }
                             }
-                            commandHistory.isHtml.push(true);
-                            return result;
+                            return {isHtml: true, result: result};
                         }
                         default: {
-                            commandHistory.isHtml.push(true);
-                            return "Now unavailable"
+                            return {isHtml: false, result: "Now unavailable"}
                             break;
                         }
                     }
-                    commandHistory.isHtml.push(true);
-                    return "";
+                    return {isHtml: false, result: ""};
                 }
             }
         })
@@ -358,21 +342,18 @@
                     let result = "";
                     switch (arr.length) {
                         case 1: {
-                            commandHistory.isHtml.push(true);
-                            return "";
+                            return {isHtml: false, result: ""};
                         }
                         case 2: {
                             let temp = prompt.enterTargetDir(arr[1]);
                             if (Object.prototype.toString.call(temp) == "[object String]") {
-                                commandHistory.isHtml.push(false);
                                 if (temp == "ERR_PERMISSION_DENIED") {
-                                    return "cd: permission denied: " + arr[1];
+                                    return {isHtml: false, result: "cd: permission denied: " + arr[1]};
                                 }
-                                return "cd: no such file or directory: " + arr[1];
+                                return {isHtml: false, result: "cd: no such file or directory: " + arr[1]};
                             }
                             if (!temp.isDir) {
-                                commandHistory.isHtml.push(false);
-                                return "cd: not a directory: " + arr[1];
+                                return {isHtml: false, result: "cd: not a directory: " + arr[1]};
                             }
                             let target = arr[1].replace(new RegExp('^\\/+|\\/+$', 'g'), '').split("/");
                             if (target[0] == "~") {
@@ -388,17 +369,14 @@
                                 }
                                 prompt.directory.push(i);
                             }
-                            commandHistory.isHtml.push(true);
-                            return "";
+                            return {isHtml: false, result: ""};
                         }
                         default: {
-                            commandHistory.isHtml.push(false);
-                            return "cd: string not in pwd: " + arr[1];
+                            return {isHtml: false, result: "cd: string not in pwd: " + arr[1]};
                             break;
                         }
                     }
-                    commandHistory.isHtml.push(true);
-                    return "";
+                    return {isHtml: false, result: ""};
                 }
             }
         })
@@ -408,8 +386,7 @@
                     commandHistory.prompts.splice(0,commandHistory.prompts.length);
                     commandHistory.commands.splice(0,commandHistory.commands.length);
                     commandHistory.results.splice(0,commandHistory.results.length);
-                    commandHistory.isHtml.push(true);
-                    return "";
+                    return {isHtml: false, result: ""};
                 }
             }
         })
@@ -417,8 +394,7 @@
             methods: {
                 shutdown: function(arr) {
                     window.location.href = "about:blank";
-                    commandHistory.isHtml.push(true);
-                    return "";
+                    return {isHtml: false, result: ""};
                 }
             }
         })
