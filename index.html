@@ -25,21 +25,19 @@
                 Current progress: no backend.
             </div>
             <div class = "introduce">
-                Arect Shell v0.2.2
+                Arect Shell v0.3.0
             </div>
         </header>
         <div class = "commandHistory" id = "commandHistory">
             <div v-for = "(item, index) in prompts" class = "commandHistoryItem">
                 {{ item.prompt }} {{ commands[index].command }}<br />
-                <div v-if = "results[index].isHtml == true" v-html = "results[index].result"></div>
+                <div v-if = "results[index].isHtml == true" v-html = "results[index].result" class = "historyItem"></div>
                 <div v-else v-text = "results[index].result"></div>
             </div>
         </div>
         <div class = "commandMain">
             <div id = "commandInput" spellcheck = "false" autocomplete = "off" autocorrect = "off">
-                <span id = "prompt">
-                    {{ toString_() }}
-                </span>
+                <span id = "prompt" v-text = "toString_()"></span>
                 <span
                     contenteditable = "true"
                     id = "inputCommand"
@@ -57,14 +55,14 @@
         var prompt = new Vue ({
             el: "#prompt",
             data: {
-                username: 'visitor',
-                device: 'kanofans_com',
+                username: "visitor",
+                device: "kanofans_com",
                 directory: ["~"],
-                authority: '$',
+                authority: "$"
             },
             methods: {
                 toString_: function() {
-                    return this.toString = '[' + this.username + '@' + this.device + ' ' + this.directory[this.directory.length - 1] + '] ' + this.authority;
+                    return this.toString = "[" + this.username + "@" + this.device + " " + this.directory[this.directory.length - 1] + "] " + this.authority;
                 },
                 getFullLocation: function() {
                     let temp = "~";
@@ -229,6 +227,13 @@
                     let command = this.$refs.command.innerText.trim().split(/\s+/);
                     commandHistory.prompts.push({prompt: prompt.toString_()});
                     commandHistory.commands.push({command: this.$refs.command.innerText});
+                    if (command.length > 1) {
+                        if (command[1] == "--help") {
+                            commandHistory.results.push(c_help.helpBy__help(command[0]));
+                            this.$refs.command.innerHTML = "";
+                            return;
+                        }
+                    }
                     switch (command[0]) {
                         case "ls": {
                             commandHistory.results.push(c_ls.ls(command));
@@ -244,6 +249,14 @@
                         }
                         case "shutdown": {
                             commandHistory.results.push(c_shutdown.shutdown(command));
+                            break;
+                        }
+                        case "cat": {
+                            commandHistory.results.push(c_cat.cat(command));
+                            break;
+                        }
+                        case "help": {
+                            commandHistory.results.push(c_help.help(command));
                             break;
                         }
                         case "": {
@@ -276,12 +289,12 @@
                         content: [{
                             name: "second.file",
                             isDir: false,
-                            content: []
+                            content: ["<h1 style = \"color: #999999\">第二个文件</h1>"]
                         }]
                     },{
                         name: "test.txt",
                         isDir: false,
-                        content: []
+                        content: ["这是test.txt", "这是test.txt的第二行"]
                     }]
                 }]
             }
@@ -328,7 +341,7 @@
                             return {isHtml: true, result: result};
                         }
                         default: {
-                            return {isHtml: false, result: "Now unavailable"}
+                            return {isHtml: false, result: "Unavailable"}
                             break;
                         }
                     }
@@ -395,6 +408,79 @@
                 shutdown: function(arr) {
                     window.location.href = "about:blank";
                     return {isHtml: false, result: ""};
+                }
+            }
+        })
+        var c_cat = new Vue({
+            methods: {
+                cat: function(arr) {
+                    switch (arr.length) {
+                        case 1: {
+                            return {isHtml: true, result: "<span style = \"color: #E91E63;\">喵~</span>"}
+                            break;
+                        }
+                        case 2: {
+                            let result = "";
+                            let temp = prompt.enterTargetDir(arr[1]);
+                            if (Object.prototype.toString.call(temp) == "[object String]") {
+                                if (temp == "ERR_PERMISSION_DENIED") {
+                                    return {isHtml: false, result: "cat: " + arr[1] + ": Permission denied"};
+                                }
+                                return {isHtml: false, result: "cat: " + arr[1] + ": No such file or directory"};
+                            }
+                            if (temp.isDir) {
+                                return {isHtml: false, result: "cat: " + arr[1] + ": Is a directory"};
+                            }
+                            for (let i of temp.content) {
+                                result += "<p>" + i + "</p>";
+                            }
+                            return {isHtml: true, result: result};
+                        }
+                        default: {
+                            return {isHtml: false, result: "Unavailable"}
+                            break;
+                        }
+                    }
+                }
+            }
+        })
+        var c_help = new Vue({
+            data: {
+                commands: [{
+                    name: "cat",
+                    describe: "Usage: cat [FILE]...<br />Concatenate FILE to standard output(Actually HTML)."
+                },{
+                    name: "cd",
+                    describe: "cd: no such file or directory: --help<br />Just a joke."
+                },{
+                    name: "clear",
+                    describe: "Usage: clear<br />Clear history."
+                },{
+                    name: "help",
+                    describe: "Usage: help<br />List the commands which I want you to see."
+                },{
+                    name: "ls",
+                    describe: "Usage: ls [FILE/DIR]...<br />List the FILEs (the current directory by default)."
+                },{
+                    name: "shutdown",
+                    describe: "Usage: shutdown<br />Switch to blank page."
+                }]
+            },
+            methods: {
+                helpBy__help: function(name) {
+                    for (let i of this.commands) {
+                        if (i.name == name) {
+                            return {isHtml: true, result: i.describe};
+                        }
+                    }
+                    return {isHtml: false, result: "-ArectShell: command not found:&ensp;" + name};
+                },
+                help: function(arr) {
+                    let temp = "";
+                    for (let i of this.commands) {
+                        temp += "<div class = \"helpItem\">" + i.name + "</div>";
+                    }
+                    return {isHtml: true, result: temp}
                 }
             }
         })
