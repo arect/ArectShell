@@ -25,14 +25,16 @@
                 Current progress: no backend.
             </div>
             <div class = "introduce">
-                Arect Shell v0.3.0
+                Arect Shell v0.4.0
             </div>
         </header>
         <div class = "commandHistory" id = "commandHistory">
-            <div v-for = "(item, index) in prompts" class = "commandHistoryItem">
-                {{ item.prompt }} {{ commands[index].command }}<br />
-                <div v-if = "results[index].isHtml == true" v-html = "results[index].result" class = "historyItem"></div>
-                <div v-else v-text = "results[index].result"></div>
+            <div v-for = "(item, index) in prompts" class = "historyItem">
+                {{ item }} {{ commands[index] }}<br />
+                <div v-for = "i in results[index]">
+                    <div v-if = "i.isHtml" v-html = "i.result"></div>
+                    <div v-else v-text = "i.result"></div>
+                </div>
             </div>
         </div>
         <div class = "commandMain">
@@ -225,8 +227,8 @@
                 exec: function() {
                     event.preventDefault();
                     let command = this.$refs.command.innerText.trim().split(/\s+/);
-                    commandHistory.prompts.push({prompt: prompt.toString_()});
-                    commandHistory.commands.push({command: this.$refs.command.innerText});
+                    commandHistory.prompts.push(prompt.toString_());
+                    commandHistory.commands.push(this.$refs.command.innerText);
                     if (command.length > 1) {
                         if (command[1] == "--help") {
                             commandHistory.results.push(c_help.helpBy__help(command[0]));
@@ -302,50 +304,56 @@
         var c_ls = new Vue({
             methods: {
                 ls: function(arr) {
-                    let result = "";
                     switch (arr.length) {
                         case 1: {
                             let temp = prompt.getCurrentLocation();
+                            let tempStr = ""
                             for (let i of temp.content) {
                                 if (i.isDir == true) {
-                                    result += "<span class = \"ls_dir\">" + i.name + "</span>&ensp;&ensp;";
+                                    tempStr += "<div class = \"helpItem ls_dir\">" + i.name + "</div>";
                                 }
                                 else {
-                                    result += i.name + "&ensp;&ensp;";
+                                    tempStr += "<div class = \"helpItem\">" + i.name + "</div>";
                                 }
                             }
-                            if (result == "") {
-                                result += "<br />";
+                            if (tempStr == "") {
+                                tempStr += "<br />";
                             }
-                            return {isHtml: true, result: result};
-                        }
-                        case 2: {
-                            let temp = prompt.enterTargetDir(arr[1]);
-                            if (Object.prototype.toString.call(temp) == "[object String]") {
-                                if (temp == "ERR_PERMISSION_DENIED") {
-                                    return {isHtml: false, result: "ls: cannot open directory \'" + arr[1] + "\': Permission denied"};
-                                }
-                                return {isHtml: false, result: "ls: no such file or directory: " + arr[1]};
-                            }
-                            if (!temp.isDir) {
-                                return {isHtml: true, result: temp.name};
-                            }
-                            for (let i of temp.content) {
-                                if (i.isDir == true) {
-                                    result += "<span class = \"ls_dir\">" + i.name + "</span>&ensp;&ensp;";
-                                }
-                                else {
-                                    result += i.name + "&ensp;&ensp;";
-                                }
-                            }
-                            return {isHtml: true, result: result};
+                            return [{isHtml: true, result: tempStr}];
                         }
                         default: {
-                            return {isHtml: false, result: "Unavailable"}
-                            break;
+                            let result = [];
+                            for (let i = 1; i < arr.length; i++) {
+                                let temp = prompt.enterTargetDir(arr[i]);
+                                let tempStr = "";
+                                if (Object.prototype.toString.call(temp) == "[object String]") {
+                                    if (temp == "ERR_PERMISSION_DENIED") {
+                                        result.push({isHtml: false, result: "ls: cannot open directory \'" + arr[i] + "\': Permission denied"});
+                                        continue;
+                                    }
+                                    result.push({isHtml: false, result: "ls: no such file or directory: " + arr[i]});
+                                    continue;
+                                }
+                                if (!temp.isDir) {
+                                    result.push({isHtml: true, result: temp.name});
+                                    continue;
+                                }
+                                if (arr.length > 2){
+                                    tempStr += arr[i] + ":<br />";
+                                }
+                                for (let ii of temp.content) {
+                                    if (ii.isDir == true) {
+                                        tempStr += "<div class = \"helpItem ls_dir\">" + ii.name + "</div>";
+                                    }
+                                    else {
+                                        tempStr += "<div class = \"helpItem\">" + ii.name + "</div>";
+                                    }
+                                }
+                                result.push({isHtml: true, result: tempStr + "<br />"});
+                            }
+                            return result;
                         }
                     }
-                    return {isHtml: false, result: ""};
                 }
             }
         })
@@ -355,18 +363,18 @@
                     let result = "";
                     switch (arr.length) {
                         case 1: {
-                            return {isHtml: false, result: ""};
+                            return [{isHtml: false, result: ""}];
                         }
                         case 2: {
                             let temp = prompt.enterTargetDir(arr[1]);
                             if (Object.prototype.toString.call(temp) == "[object String]") {
                                 if (temp == "ERR_PERMISSION_DENIED") {
-                                    return {isHtml: false, result: "cd: permission denied: " + arr[1]};
+                                    return [{isHtml: false, result: "cd: permission denied: " + arr[1]}];
                                 }
-                                return {isHtml: false, result: "cd: no such file or directory: " + arr[1]};
+                                return [{isHtml: false, result: "cd: no such file or directory: " + arr[1]}];
                             }
                             if (!temp.isDir) {
-                                return {isHtml: false, result: "cd: not a directory: " + arr[1]};
+                                return [{isHtml: false, result: "cd: not a directory: " + arr[1]}];
                             }
                             let target = arr[1].replace(new RegExp('^\\/+|\\/+$', 'g'), '').split("/");
                             if (target[0] == "~") {
@@ -382,10 +390,10 @@
                                 }
                                 prompt.directory.push(i);
                             }
-                            return {isHtml: false, result: ""};
+                            return [{isHtml: false, result: ""}];
                         }
                         default: {
-                            return {isHtml: false, result: "cd: string not in pwd: " + arr[1]};
+                            return [{isHtml: false, result: "cd: string not in pwd: " + arr[1]}];
                             break;
                         }
                     }
@@ -399,7 +407,7 @@
                     commandHistory.prompts.splice(0,commandHistory.prompts.length);
                     commandHistory.commands.splice(0,commandHistory.commands.length);
                     commandHistory.results.splice(0,commandHistory.results.length);
-                    return {isHtml: false, result: ""};
+                    return [{isHtml: false, result: ""}];
                 }
             }
         })
@@ -407,7 +415,7 @@
             methods: {
                 shutdown: function(arr) {
                     window.location.href = "about:blank";
-                    return {isHtml: false, result: ""};
+                    return [{isHtml: false, result: ""}];
                 }
             }
         })
@@ -416,29 +424,30 @@
                 cat: function(arr) {
                     switch (arr.length) {
                         case 1: {
-                            return {isHtml: true, result: "<span style = \"color: #E91E63;\">喵~</span>"}
+                            return [{isHtml: true, result: "<span style = \"color: #E91E63;\">喵~</span>"}];
                             break;
-                        }
-                        case 2: {
-                            let result = "";
-                            let temp = prompt.enterTargetDir(arr[1]);
-                            if (Object.prototype.toString.call(temp) == "[object String]") {
-                                if (temp == "ERR_PERMISSION_DENIED") {
-                                    return {isHtml: false, result: "cat: " + arr[1] + ": Permission denied"};
-                                }
-                                return {isHtml: false, result: "cat: " + arr[1] + ": No such file or directory"};
-                            }
-                            if (temp.isDir) {
-                                return {isHtml: false, result: "cat: " + arr[1] + ": Is a directory"};
-                            }
-                            for (let i of temp.content) {
-                                result += "<p>" + i + "</p>";
-                            }
-                            return {isHtml: true, result: result};
                         }
                         default: {
-                            return {isHtml: false, result: "Unavailable"}
-                            break;
+                            let result = [];
+                            for (let i = 1; i < arr.length; i++) {
+                                let temp = prompt.enterTargetDir(arr[i]);
+                                if (Object.prototype.toString.call(temp) == "[object String]") {
+                                    if (temp == "ERR_PERMISSION_DENIED") {
+                                        result.push({isHtml: false, result: "cat: " + arr[i] + ": Permission denied"});
+                                        continue;
+                                    }
+                                    result.push({isHtml: false, result: "cat: " + arr[i] + ": No such file or directory"});
+                                    continue;
+                                }
+                                if (temp.isDir) {
+                                    result.push({isHtml: false, result: "cat: " + arr[i] + ": Is a directory"});
+                                    continue;
+                                }
+                                for (let ii of temp.content) {
+                                    result.push({isHtml: false, result: ii});
+                                }
+                            }
+                            return result;
                         }
                     }
                 }
@@ -448,7 +457,7 @@
             data: {
                 commands: [{
                     name: "cat",
-                    describe: "Usage: cat [FILE]...<br />Concatenate FILE to standard output(Actually HTML)."
+                    describe: "Usage: cat [FILE]...<br />Concatenate FILE to standard output."
                 },{
                     name: "cd",
                     describe: "cd: no such file or directory: --help<br />Just a joke."
@@ -470,17 +479,17 @@
                 helpBy__help: function(name) {
                     for (let i of this.commands) {
                         if (i.name == name) {
-                            return {isHtml: true, result: i.describe};
+                            return [{isHtml: true, result: i.describe}];
                         }
                     }
-                    return {isHtml: false, result: "-ArectShell: command not found:&ensp;" + name};
+                    return [{isHtml: false, result: "-ArectShell: command not found:&ensp;" + name}];
                 },
                 help: function(arr) {
                     let temp = "";
                     for (let i of this.commands) {
                         temp += "<div class = \"helpItem\">" + i.name + "</div>";
                     }
-                    return {isHtml: true, result: temp}
+                    return [{isHtml: true, result: temp}];
                 }
             }
         })
