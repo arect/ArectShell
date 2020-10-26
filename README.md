@@ -4,7 +4,7 @@
 
 启发于[Axton: About Me](https://axton.cc/)，于是打算自己也做一个。
 
-正在持续制作中，目前只实现了界面和ls、cd、clear、shutdown。
+正在持续制作中。
 
 ## 已实现的命令
 
