@@ -9,8 +9,16 @@
             type = "text/css"
             href = "./css/style.css"
         >
-        <link href="https://fonts.font.im/css?family=Oxygen+Mono" rel="stylesheet">
-        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <!--link
+            rel="stylesheet"
+            href="https://fonts.font.im/css?family=Oxygen+Mono"
+        -->
+        <script
+            src="./js/vue.js"
+        ></script>
+        <script
+            src="./js/main.js"
+        ></script>
         <title>ArectShell</title>
     </head>
     <body>
@@ -19,13 +27,12 @@
                 Hi~ <br />
                 This page was inspired by <a href = "https://axton.cc" target = "_blank">axton</a>.<br />
                 <span style = "color: #F44336;">
-                    Known issue: 1. Sometimes the cursor does not appear when clicking "input here".
+                    Known issue: Sometimes the cursor does not appear when clicking "input here".
                 </span>
-                <br />
-                Current progress: no backend.
             </div>
-            <div class = "introduce">
-                Arect Shell v0.4.0
+            <div class = "introduce" id = "shellMessage">
+                {{ name }} {{ version }}
+                <span v-if = "isBeta" style = "color: #FF9800">beta</span>
             </div>
         </header>
         <div class = "commandHistory" id = "commandHistory">
@@ -54,6 +61,30 @@
         </div>
     </body>
     <script>
+        var mode = new Vue({
+            data: {
+                sign: "",
+                content: "",
+            },
+            methods: {
+                sudo: function() {
+                    this.isActive = true;
+                    this.content = "[sudo] password for " + prompt.username + ":";
+                },
+                normal: function() {
+                    this.isActive = false;
+                    this.content = "";
+                }
+            }
+        });
+        var shell = new Vue({
+            el: "#shellMessage",
+            data: {
+                name: "Arect Shell",
+                version: "0.5.0",
+                isBeta: true
+            }
+        })
         var prompt = new Vue ({
             el: "#prompt",
             data: {
@@ -64,6 +95,9 @@
             },
             methods: {
                 toString_: function() {
+                    if (mode.sign != "") {
+                        return mode.content;
+                    }
                     return this.toString = "[" + this.username + "@" + this.device + " " + this.directory[this.directory.length - 1] + "] " + this.authority;
                 },
                 getFullLocation: function() {
@@ -209,7 +243,7 @@
                     return "ERR_NO_SUCH_DIR_OR_FILE";
                 }
             }
-        })
+        });
         var commandHistory = new Vue ({
             el: "#commandHistory",
             data: {
@@ -217,7 +251,7 @@
                 commands: [],
                 results: [],
             }
-        })
+        });
         var inputCommand = new Vue ({
             el: "#inputCommand",
             data: {
@@ -226,9 +260,15 @@
             methods: {
                 exec: function() {
                     event.preventDefault();
-                    let command = this.$refs.command.innerText.trim().split(/\s+/);
-                    commandHistory.prompts.push(prompt.toString_());
-                    commandHistory.commands.push(this.$refs.command.innerText);
+                    if (!mode.isActive) {
+                        let command = this.$refs.command.innerText.trim().split(/\s+/);
+                        commandHistory.prompts.push(prompt.toString_());
+                        commandHistory.commands.push(this.$refs.command.innerText);
+                        this.select(command);
+                        this.$refs.command.innerHTML = "";
+                    }
+                },
+                select: function(command) {
                     if (command.length > 1) {
                         if (command[1] == "--help") {
                             commandHistory.results.push(c_help.helpBy__help(command[0]));
@@ -237,6 +277,10 @@
                         }
                     }
                     switch (command[0]) {
+                        case "about": {
+                            commandHistory.results.push(c_about.about(command));
+                            break;
+                        }
                         case "ls": {
                             commandHistory.results.push(c_ls.ls(command));
                             break;
@@ -257,20 +301,23 @@
                             commandHistory.results.push(c_cat.cat(command));
                             break;
                         }
+                        case "html": {
+                            commandHistory.results.push(c_html.html(command));
+                            break;
+                        }
                         case "help": {
                             commandHistory.results.push(c_help.help(command));
                             break;
                         }
                         case "": {
-                            commandHistory.results.push({isHtml: false, result: ""});
+                            commandHistory.results.push([{isHtml: false, result: ""}]);
                             break;
                         }
                         default: {
-                            commandHistory.results.push({isHtml: false, result: "-ArectShell: command not found: " + command[0]});
+                            commandHistory.results.push([{isHtml: false, result: "-ArectShell: command not found: " + command[0]}]);
                             break;
                         }  
                     }
-                    this.$refs.command.innerHTML = "";
                 },
                 inputFocus: function(b) {
                     if(this.$refs.command.innerText == ''){
@@ -278,7 +325,7 @@
                     }
                 }
             }
-        })
+        });
         var d_fileTree = new Vue({
             data: {
                 fileTree: [{
@@ -300,198 +347,6 @@
                     }]
                 }]
             }
-        })
-        var c_ls = new Vue({
-            methods: {
-                ls: function(arr) {
-                    switch (arr.length) {
-                        case 1: {
-                            let temp = prompt.getCurrentLocation();
-                            let tempStr = ""
-                            for (let i of temp.content) {
-                                if (i.isDir == true) {
-                                    tempStr += "<div class = \"helpItem ls_dir\">" + i.name + "</div>";
-                                }
-                                else {
-                                    tempStr += "<div class = \"helpItem\">" + i.name + "</div>";
-                                }
-                            }
-                            if (tempStr == "") {
-                                tempStr += "<br />";
-                            }
-                            return [{isHtml: true, result: tempStr}];
-                        }
-                        default: {
-                            let result = [];
-                            for (let i = 1; i < arr.length; i++) {
-                                let temp = prompt.enterTargetDir(arr[i]);
-                                let tempStr = "";
-                                if (Object.prototype.toString.call(temp) == "[object String]") {
-                                    if (temp == "ERR_PERMISSION_DENIED") {
-                                        result.push({isHtml: false, result: "ls: cannot open directory \'" + arr[i] + "\': Permission denied"});
-                                        continue;
-                                    }
-                                    result.push({isHtml: false, result: "ls: no such file or directory: " + arr[i]});
-                                    continue;
-                                }
-                                if (!temp.isDir) {
-                                    result.push({isHtml: true, result: temp.name});
-                                    continue;
-                                }
-                                if (arr.length > 2){
-                                    tempStr += arr[i] + ":<br />";
-                                }
-                                for (let ii of temp.content) {
-                                    if (ii.isDir == true) {
-                                        tempStr += "<div class = \"helpItem ls_dir\">" + ii.name + "</div>";
-                                    }
-                                    else {
-                                        tempStr += "<div class = \"helpItem\">" + ii.name + "</div>";
-                                    }
-                                }
-                                result.push({isHtml: true, result: tempStr + "<br />"});
-                            }
-                            return result;
-                        }
-                    }
-                }
-            }
-        })
-        var c_cd = new Vue({
-            methods: {
-                cd: function(arr) {
-                    let result = "";
-                    switch (arr.length) {
-                        case 1: {
-                            return [{isHtml: false, result: ""}];
-                        }
-                        case 2: {
-                            let temp = prompt.enterTargetDir(arr[1]);
-                            if (Object.prototype.toString.call(temp) == "[object String]") {
-                                if (temp == "ERR_PERMISSION_DENIED") {
-                                    return [{isHtml: false, result: "cd: permission denied: " + arr[1]}];
-                                }
-                                return [{isHtml: false, result: "cd: no such file or directory: " + arr[1]}];
-                            }
-                            if (!temp.isDir) {
-                                return [{isHtml: false, result: "cd: not a directory: " + arr[1]}];
-                            }
-                            let target = arr[1].replace(new RegExp('^\\/+|\\/+$', 'g'), '').split("/");
-                            if (target[0] == "~") {
-                                prompt.directory.splice(0,prompt.directory.length);
-                            }
-                            for (let i of target) {
-                                if (i == ".") {
-                                    continue;
-                                }
-                                if (i == "..") {
-                                    prompt.directory.pop();
-                                    continue;
-                                }
-                                prompt.directory.push(i);
-                            }
-                            return [{isHtml: false, result: ""}];
-                        }
-                        default: {
-                            return [{isHtml: false, result: "cd: string not in pwd: " + arr[1]}];
-                            break;
-                        }
-                    }
-                    return {isHtml: false, result: ""};
-                }
-            }
-        })
-        var c_clear = new Vue({
-            methods: {
-                clear: function() {
-                    commandHistory.prompts.splice(0,commandHistory.prompts.length);
-                    commandHistory.commands.splice(0,commandHistory.commands.length);
-                    commandHistory.results.splice(0,commandHistory.results.length);
-                    return [{isHtml: false, result: ""}];
-                }
-            }
-        })
-        var c_shutdown = new Vue({
-            methods: {
-                shutdown: function(arr) {
-                    window.location.href = "about:blank";
-                    return [{isHtml: false, result: ""}];
-                }
-            }
-        })
-        var c_cat = new Vue({
-            methods: {
-                cat: function(arr) {
-                    switch (arr.length) {
-                        case 1: {
-                            return [{isHtml: true, result: "<span style = \"color: #E91E63;\">喵~</span>"}];
-                            break;
-                        }
-                        default: {
-                            let result = [];
-                            for (let i = 1; i < arr.length; i++) {
-                                let temp = prompt.enterTargetDir(arr[i]);
-                                if (Object.prototype.toString.call(temp) == "[object String]") {
-                                    if (temp == "ERR_PERMISSION_DENIED") {
-                                        result.push({isHtml: false, result: "cat: " + arr[i] + ": Permission denied"});
-                                        continue;
-                                    }
-                                    result.push({isHtml: false, result: "cat: " + arr[i] + ": No such file or directory"});
-                                    continue;
-                                }
-                                if (temp.isDir) {
-                                    result.push({isHtml: false, result: "cat: " + arr[i] + ": Is a directory"});
-                                    continue;
-                                }
-                                for (let ii of temp.content) {
-                                    result.push({isHtml: false, result: ii});
-                                }
-                            }
-                            return result;
-                        }
-                    }
-                }
-            }
-        })
-        var c_help = new Vue({
-            data: {
-                commands: [{
-                    name: "cat",
-                    describe: "Usage: cat [FILE]...<br />Concatenate FILE to standard output."
-                },{
-                    name: "cd",
-                    describe: "cd: no such file or directory: --help<br />Just a joke."
-                },{
-                    name: "clear",
-                    describe: "Usage: clear<br />Clear history."
-                },{
-                    name: "help",
-                    describe: "Usage: help<br />List the commands which I want you to see."
-                },{
-                    name: "ls",
-                    describe: "Usage: ls [FILE/DIR]...<br />List the FILEs (the current directory by default)."
-                },{
-                    name: "shutdown",
-                    describe: "Usage: shutdown<br />Switch to blank page."
-                }]
-            },
-            methods: {
-                helpBy__help: function(name) {
-                    for (let i of this.commands) {
-                        if (i.name == name) {
-                            return [{isHtml: true, result: i.describe}];
-                        }
-                    }
-                    return [{isHtml: false, result: "-ArectShell: command not found:&ensp;" + name}];
-                },
-                help: function(arr) {
-                    let temp = "";
-                    for (let i of this.commands) {
-                        temp += "<div class = \"helpItem\">" + i.name + "</div>";
-                    }
-                    return [{isHtml: true, result: temp}];
-                }
-            }
-        })
+        }); 
     </script>
 </html>
