@@ -1,7 +1,7 @@
 body {
     padding: 0;
     margin: 0;
-    font-family: 'Cascadia Mono Light', 'Oxygen Mono', monospace, Consolas;
+    font-family: 'Cascadia Mono Light', 'Oxygen Mono', monospace, Space Mono Regular;
 }
 .aboutMe {
     padding-top: 12px;
@@ -40,7 +40,7 @@ body {
     padding-left: 6px;
     padding-right: 6px;
 }
-.commandHistoryItem {
+.HistoryItem {
     padding-bottom: 10px;
 }
 a {
@@ -57,4 +57,15 @@ a:hover {
 }
 .ls_dir {
     color: #2196F3;
+}
+.helpItem {
+    float: left;
+    width: 150px;
+}
+.historyItem:after {
+    display: block;
+    content: '.';
+    clear: both;
+    line-height: 0;
+    visibility: hidden;
 }
