@@ -1,178 +1,219 @@
 <html>
-    <head>
-        <meta
+<head>
+    <meta
             name = "viewport"
             content = "width = device-width, initial-scale = 1.0, maximum-scale = 1.0, user-scalable = no"
-        >
-        <link
+    >
+    <link
             rel = "stylesheet"
             type = "text/css"
             href = "./css/style.css"
-        >
-        <!--link
-            rel="stylesheet"
-            href="https://fonts.font.im/css?family=Oxygen+Mono"
-        -->
-        <script
+    >
+    <!--link
+        rel="stylesheet"
+        href="https://fonts.font.im/css?family=Oxygen+Mono"
+    -->
+    <script
             src="./js/vue.js"
-        ></script>
-        <script
+    ></script>
+    <script
             src="./js/main.js"
-        ></script>
-        <title>ArectShell</title>
-    </head>
-    <body>
-        <header>
-            <div class = "aboutMe">
-                Hi~ <br />
-                This page was inspired by <a href = "https://axton.cc" target = "_blank">axton</a>.<br />
-                <span style = "color: #F44336;">
+    ></script>
+    <title>ArectShell</title>
+</head>
+<body>
+<header>
+    <div class = "aboutMe">
+        Hi~ <br />
+        This page was inspired by <a href = "https://axton.cc" target = "_blank">axton</a>.<br />
+        <span style = "color: #F44336;">
                     Known issue: Sometimes the cursor does not appear when clicking "input here".
                 </span>
-            </div>
-            <div class = "introduce" id = "shellMessage">
-                {{ name }} {{ version }}
-                <span v-if = "isBeta" style = "color: #FF9800">beta</span>
-            </div>
-        </header>
-        <div class = "commandHistory" id = "commandHistory">
-            <div v-for = "(item, index) in prompts" class = "historyItem">
-                {{ item }} {{ commands[index] }}<br />
-                <div v-for = "i in results[index]">
-                    <div v-if = "i.isHtml" v-html = "i.result"></div>
-                    <div v-else v-text = "i.result"></div>
-                </div>
-            </div>
+    </div>
+    <div class = "introduce" id = "shellMessage">
+        {{ name }} {{ version }}
+        <span v-if = "isBeta" style = "color: #FF9800">beta</span>
+    </div>
+</header>
+<div class = "commandHistory" id = "commandHistory">
+    <div v-for = "(item, index) in prompts" class = "historyItem">
+        {{ item }} {{ commands[index] }}<br />
+        <div v-for = "i in results[index]">
+            <div v-if = "i.isHtml" v-html = "i.result"></div>
+            <div v-else v-text = "i.result"></div>
         </div>
-        <div class = "commandMain">
-            <div id = "commandInput" spellcheck = "false" autocomplete = "off" autocorrect = "off">
-                <span id = "prompt" v-text = "toString_()"></span>
-                <span
-                    contenteditable = "true"
-                    id = "inputCommand"
-                    v-bind:class = "{ commandInput: !isFocused, commandFocus: isFocused }"
-                    v-on:focus = "inputFocus(true)"
-                    v-on:blur = "inputFocus(false)"
-                    v-on:keydown.enter = "exec()"
-                    ref = "command"
-                >
+    </div>
+</div>
+<div class = "commandMain">
+    <div id = "commandInput" spellcheck = "false" autocomplete = "off" autocorrect = "off">
+        <span id = "prompt" v-text = "toString_()"></span>
+        <span
+                contenteditable = "true"
+                id = "inputCommand"
+                v-bind:class = "{ commandInput: !isFocused, commandFocus: isFocused }"
+                v-on:focus = "inputFocus(true)"
+                v-on:blur = "inputFocus(false)"
+                v-on:keydown.enter = "exec()"
+                ref = "command"
+        >
                 </span>
-            </div>
-        </div>
-    </body>
-    <script>
-        var mode = new Vue({
-            data: {
-                sign: "",
-                content: "",
+    </div>
+</div>
+</body>
+<script>
+    var mode = new Vue({
+        data: {
+            sign: "",
+            content: "",
+        },
+        methods: {
+            sudo: function() {
+                this.isActive = true;
+                this.content = "[sudo] password for " + prompt.username + ":";
             },
-            methods: {
-                sudo: function() {
-                    this.isActive = true;
-                    this.content = "[sudo] password for " + prompt.username + ":";
-                },
-                normal: function() {
-                    this.isActive = false;
-                    this.content = "";
+            normal: function() {
+                this.isActive = false;
+                this.content = "";
+            }
+        }
+    });
+    var shell = new Vue({
+        el: "#shellMessage",
+        data: {
+            name: "Arect Shell",
+            version: "0.5.0",
+            isBeta: true
+        }
+    })
+    var prompt = new Vue ({
+        el: "#prompt",
+        data: {
+            username: "visitor",
+            device: "kanofans_com",
+            directory: ["~"],
+            authority: "$"
+        },
+        methods: {
+            toString_: function() {
+                if (mode.sign != "") {
+                    return mode.content;
                 }
-            }
-        });
-        var shell = new Vue({
-            el: "#shellMessage",
-            data: {
-                name: "Arect Shell",
-                version: "0.5.0",
-                isBeta: true
-            }
-        })
-        var prompt = new Vue ({
-            el: "#prompt",
-            data: {
-                username: "visitor",
-                device: "kanofans_com",
-                directory: ["~"],
-                authority: "$"
+                return this.toString = "[" + this.username + "@" + this.device + " " + this.directory[this.directory.length - 1] + "] " + this.authority;
             },
-            methods: {
-                toString_: function() {
-                    if (mode.sign != "") {
-                        return mode.content;
-                    }
-                    return this.toString = "[" + this.username + "@" + this.device + " " + this.directory[this.directory.length - 1] + "] " + this.authority;
-                },
-                getFullLocation: function() {
-                    let temp = "~";
-                    for (let index = 1; index < this.directory.length; index++) {
-                        temp += "/" + this.directory[index];
-                    }
-                    return temp;
-                },
-                getCurrentLocation: function() {
-                    let temp = d_fileTree.fileTree;
-                    for (let i of temp) {
-                        if (i.owner = this.username) {
-                            temp = i;
-                            for (let ii = 1; ii < this.directory.length; ii++) {
-                                let isFound = false;
-                                for (let iii of temp.content) {
-                                    if (iii.name == this.directory[ii]) {
-                                        isFound = true;
-                                        temp = iii;
-                                        break;
-                                    }
-                                }
-                                if (!isFound) {
-                                    return "ERR_NO_SUCH_DIR_OR_FILE";
+            getFullLocation: function() {
+                let temp = "~";
+                for (let index = 1; index < this.directory.length; index++) {
+                    temp += "/" + this.directory[index];
+                }
+                return temp;
+            },
+            getCurrentLocation: function() {
+                let temp = d_fileTree.fileTree;
+                for (let i of temp) {
+                    if (i.owner = this.username) {
+                        temp = i;
+                        for (let ii = 1; ii < this.directory.length; ii++) {
+                            let isFound = false;
+                            for (let iii of temp.content) {
+                                if (iii.name == this.directory[ii]) {
+                                    isFound = true;
+                                    temp = iii;
+                                    break;
                                 }
                             }
+                            if (!isFound) {
+                                return "ERR_NO_SUCH_DIR_OR_FILE";
+                            }
+                        }
+                        return temp;
+                    }
+                }
+                return temp;
+            },
+            findFather: function(child) {
+                let list = [];
+                for (let i of d_fileTree.fileTree) {
+                    if (child === i) {
+                        return "ERR_PERMISSION_DENIED";
+                    }
+                    if (i.isDir) {
+                        list.push(i);
+                    }
+                }
+                while (list.length > 0) {
+                    let temp = list.shift();
+                    if (temp.isDir) {
+                        for (let i of temp.content) {
+                            if (i === child) {
+                                return temp;
+                            }
+                            if (i.isDir) {
+                                list.push(i);
+                            }
+                        }
+                    }
+                }
+            },
+            getUserDir: function() {
+                for (let i of d_fileTree.fileTree) {
+                    if (i.owner == this.username) {
+                        return i;
+                    }
+                }
+                return "ERR_IN_FINDING_USER_DIR";
+            },
+            enterTargetDir: function(arr) {
+                if (Object.prototype.toString.call(arr) == "[object String]") {
+                    arr = arr.trim().replace(new RegExp('^\\/+|\\/+$', 'g'), '').split("/");
+                }
+                if (Object.prototype.toString.call(arr) != "[object Array]") {
+                    console.log("ERR_PARAMETER_TYPE_ERROR");
+                    return "ERR_NO_SUCH_DIR_OR_FILE";
+                }
+                // 相对路径
+                let temp = this.getCurrentLocation();
+                let isFound = false;
+                if (arr.length == 0) {
+                    return temp;
+                }
+                for (let i of arr) {
+                    isFound = false;
+                    if (i == ".") {
+                        isFound = true;
+                        continue;
+                    }
+                    if (i == "..") {
+                        temp = this.findFather(temp);
+                        if (Object.prototype.toString.call(temp) == "[object String]") {
                             return temp;
                         }
+                        isFound = true;
+                        continue;
                     }
+                    for (let ii of temp.content) {
+                        if (i == ii.name) {
+                            isFound = true;
+                            temp = ii;
+                            break;
+                        }
+                    }
+                    if (!isFound) {
+                        break;
+                    }
+                }
+                if (isFound) {
                     return temp;
-                },
-                findFather: function(child) {
-                    let list = [];
-                    for (let i of d_fileTree.fileTree) {
-                        if (child === i) {
-                            return "ERR_PERMISSION_DENIED";
-                        }
-                        if (i.isDir) {
-                            list.push(i);
-                        }
+                }
+                else {
+                    if (arr[0] == "~") {
+                        isFound = true;
+                        arr.shift();
+                    } else return "ERR_NO_SUCH_DIR_OR_FILE";
+                    temp = this.getUserDir();
+                    if (temp == "ERR_IN_FINDING_USER_DIR") {
+                        console.log(temp);
+                        return "ERR_IN_FINDING_USER_DIR";
                     }
-                    while (list.length > 0) {
-                        let temp = list.shift();
-                        if (temp.isDir) {
-                            for (let i of temp.content) {
-                                if (i === child) {
-                                    return temp;
-                                }
-                                if (i.isDir) {
-                                    list.push(i);
-                                }
-                            }
-                        }
-                    }
-                },
-                getUserDir: function() {
-                    for (let i of d_fileTree.fileTree) {
-                        if (i.owner == this.username) {
-                            return i;
-                        }
-                    }
-                    return "ERR_IN_FINDING_USER_DIR";
-                },
-                enterTargetDir: function(arr) {
-                    if (Object.prototype.toString.call(arr) == "[object String]") {
-                        arr = arr.trim().replace(new RegExp('^\\/+|\\/+$', 'g'), '').split("/");
-                    }
-                    if (Object.prototype.toString.call(arr) != "[object Array]") {
-                        console.log("ERR_PARAMETER_TYPE_ERROR");
-                        return "ERR_NO_SUCH_DIR_OR_FILE";
-                    }
-                    // 相对路径
-                    let temp = this.getCurrentLocation();
-                    let isFound = false;
                     for (let i of arr) {
                         isFound = false;
                         if (i == ".") {
@@ -201,152 +242,118 @@
                     if (isFound) {
                         return temp;
                     }
-                    else {
-                        if (arr[0] == "~") {
-                            isFound = true;
-                            arr.shift();
-                        } else return "ERR_NO_SUCH_DIR_OR_FILE";
-                        temp = this.getUserDir();
-                        if (temp == "ERR_IN_FINDING_USER_DIR") {
-                            console.log(temp);
-                            return "ERR_IN_FINDING_USER_DIR";
-                        }
-                        for (let i of arr) {
-                            isFound = false;
-                            if (i == ".") {
-                                isFound = true;
-                                continue;
-                            }
-                            if (i == "..") {
-                                temp = this.findFather(temp);
-                                if (Object.prototype.toString.call(temp) == "[object String]") {
-                                    return temp;
-                                }
-                                isFound = true;
-                                continue;
-                            }
-                            for (let ii of temp.content) {
-                                if (i == ii.name) {
-                                    isFound = true;
-                                    temp = ii;
-                                    break;
-                                }
-                            }
-                            if (!isFound) {
-                                break;
-                            }
-                        }
-                        if (isFound) {
-                            return temp;
-                        }
-                    }
-                    return "ERR_NO_SUCH_DIR_OR_FILE";
                 }
+                return "ERR_NO_SUCH_DIR_OR_FILE";
             }
-        });
-        var commandHistory = new Vue ({
-            el: "#commandHistory",
-            data: {
-                prompts: [],
-                commands: [],
-                results: [],
-            }
-        });
-        var inputCommand = new Vue ({
-            el: "#inputCommand",
-            data: {
-                isFocused: false,
+        }
+    });
+    var commandHistory = new Vue ({
+        el: "#commandHistory",
+        data: {
+            prompts: [],
+            commands: [],
+            results: [],
+        }
+    });
+    var inputCommand = new Vue ({
+        el: "#inputCommand",
+        data: {
+            isFocused: false,
+        },
+        methods: {
+            exec: function() {
+                event.preventDefault();
+                if (!mode.isActive) {
+                    let command = this.$refs.command.innerText.trim().split(/\s+/);
+                    commandHistory.prompts.push(prompt.toString_());
+                    commandHistory.commands.push(this.$refs.command.innerText);
+                    this.select(command);
+                    this.$refs.command.innerHTML = "";
+                }
             },
-            methods: {
-                exec: function() {
-                    event.preventDefault();
-                    if (!mode.isActive) {
-                        let command = this.$refs.command.innerText.trim().split(/\s+/);
-                        commandHistory.prompts.push(prompt.toString_());
-                        commandHistory.commands.push(this.$refs.command.innerText);
-                        this.select(command);
+            select: function(command) {
+                if (command.length > 1) {
+                    if (command[1] == "--help") {
+                        commandHistory.results.push(c_help.helpBy__help(command[0]));
                         this.$refs.command.innerHTML = "";
-                    }
-                },
-                select: function(command) {
-                    if (command.length > 1) {
-                        if (command[1] == "--help") {
-                            commandHistory.results.push(c_help.helpBy__help(command[0]));
-                            this.$refs.command.innerHTML = "";
-                            return;
-                        }
-                    }
-                    switch (command[0]) {
-                        case "about": {
-                            commandHistory.results.push(c_about.about(command));
-                            break;
-                        }
-                        case "ls": {
-                            commandHistory.results.push(c_ls.ls(command));
-                            break;
-                        }
-                        case "cd": {
-                            commandHistory.results.push(c_cd.cd(command));
-                            break;
-                        }
-                        case "clear": {
-                            c_clear.clear();
-                            break;
-                        }
-                        case "shutdown": {
-                            commandHistory.results.push(c_shutdown.shutdown(command));
-                            break;
-                        }
-                        case "cat": {
-                            commandHistory.results.push(c_cat.cat(command));
-                            break;
-                        }
-                        case "html": {
-                            commandHistory.results.push(c_html.html(command));
-                            break;
-                        }
-                        case "help": {
-                            commandHistory.results.push(c_help.help(command));
-                            break;
-                        }
-                        case "": {
-                            commandHistory.results.push([{isHtml: false, result: ""}]);
-                            break;
-                        }
-                        default: {
-                            commandHistory.results.push([{isHtml: false, result: "-ArectShell: command not found: " + command[0]}]);
-                            break;
-                        }  
-                    }
-                },
-                inputFocus: function(b) {
-                    if(this.$refs.command.innerText == ''){
-                        this.isFocused = b;
+                        return;
                     }
                 }
+                switch (command[0]) {
+                    case "about": {
+                        commandHistory.results.push(c_about.about(command));
+                        break;
+                    }
+                    case "ls": {
+                        commandHistory.results.push(c_ls.ls(command));
+                        break;
+                    }
+                    case "cd": {
+                        commandHistory.results.push(c_cd.cd(command));
+                        break;
+                    }
+                    case "clear": {
+                        c_clear.clear();
+                        break;
+                    }
+                    case "shutdown": {
+                        commandHistory.results.push(c_shutdown.shutdown(command));
+                        break;
+                    }
+                    case "cat": {
+                        commandHistory.results.push(c_cat.cat(command));
+                        break;
+                    }
+                    case "html": {
+                        commandHistory.results.push(c_html.html(command));
+                        break;
+                    }
+                    case "help": {
+                        commandHistory.results.push(c_help.help(command));
+                        break;
+                    }
+                    case "mkdir": {
+                        commandHistory.results.push(c_mkdir.main(command));
+                        break;
+                    }
+                    case "": {
+                        commandHistory.results.push([{isHtml: false, result: ""}]);
+                        break;
+                    }
+                    default: {
+                        commandHistory.results.push([{isHtml: false, result: "-ArectShell: command not found: " + command[0]}]);
+                        break;
+                    }
+                }
+            },
+            inputFocus: function(b) {
+                if(this.$refs.command.innerText == ''){
+                    this.isFocused = b;
+                }
             }
-        });
-        var d_fileTree = new Vue({
-            data: {
-                fileTree: [{
-                    name: "~",
-                    owner: "visitor",
+        }
+    });
+    var d_fileTree = new Vue({
+        data: {
+            fileTree: [{
+                name: "~",
+                owner: "visitor",
+                isDir: true,
+                content: [{
+                    name: "testDir",
                     isDir: true,
                     content: [{
-                        name: "testDir",
-                        isDir: true,
-                        content: [{
-                            name: "second.file",
-                            isDir: false,
-                            content: ["<h1 style = \"color: #999999\">第二个文件</h1>"]
-                        }]
-                    },{
-                        name: "test.txt",
+                        name: "second.file",
                         isDir: false,
-                        content: ["这是test.txt", "这是test.txt的第二行"]
+                        content: ["<h1 style = \"color: #999999\">第二个文件</h1>"]
                     }]
+                },{
+                    name: "test.txt",
+                    isDir: false,
+                    content: ["这是test.txt", "这是test.txt的第二行"]
                 }]
-            }
-        }); 
-    </script>
+            }]
+        }
+    });
+</script>
 </html>
