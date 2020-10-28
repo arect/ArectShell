@@ -29,7 +29,7 @@ var c_mkdir = new Vue({
                     return [{isHtml: false, result: ""}];
                 }
                 case 2: {
-                    if (Object.prototype.toString.call(arr) == "[object String]") {
+                    if (Object.prototype.toString.call(arr) === "[object String]") {
                         arr = arr[1].trim().replace(new RegExp('^\\/+|\\/+$', 'g'), '').split("/");
                     }
                     switch (arr.length) {
@@ -38,26 +38,26 @@ var c_mkdir = new Vue({
                             break;
                         }
                         case 2: {
-                            if (Object.prototype.toString.call(arr) == "[object String]") {
+                            if (Object.prototype.toString.call(arr) === "[object String]") {
                                 arr = arr.trim().replace(new RegExp('^\\/+|\\/+$', 'g'), '').split("/");
                             }
-                            var target = arr.pop();
-                            if (target != undefined) {
+                            let target = arr.pop();
+                            if (target !== undefined) {
                                 for (let i of this.banList) {
-                                    if (target.indexOf(i) != -1) {
+                                    if (target.indexOf(i) !== -1) {
                                         return [{isHtml: false, result: "mkdir: invalid name: " + target}];
                                     }
                                 }
                             }
-                            var loc = prompt.getCurrentLocation(arr);
-                            if (loc == "ERR_NO_SUCH_DIR_OR_FILE") {
+                            let loc = prompt.getCurrentLocation(arr);
+                            if (loc === "ERR_NO_SUCH_DIR_OR_FILE") {
                                 let temp = "/";
                                 for (let i of arr) {
                                     temp += i + "/";
                                 }
                                 return [{isHtml: false, result: "mkdir: no such directory: " + temp}];
                             }
-                            if (loc == "ERR_PERMISSION_DENIED") {
+                            if (loc === "ERR_PERMISSION_DENIED") {
                                 let temp = "/";
                                 for (let i of arr) {
                                     temp += i + "/";
@@ -65,7 +65,7 @@ var c_mkdir = new Vue({
                                 return [{isHtml: false, result: "mkdir: permission denied: " + temp}];
                             }
                             for (let i of loc.content) {
-                                if (i.name == target) {
+                                if (i.name === target) {
                                     return [{isHtml: false, result: "mkdir: cannot create directory ‘" + target + "’: File exists"}];
                                 }
                             }
@@ -75,17 +75,15 @@ var c_mkdir = new Vue({
                                 content: []
                             })
                             return [{isHtml: false, result: ""}];
-                            break;
                         }
                         default:{
                             return [{isHtml: false, result: "mkdir: cannot create multiple folders"}]
-                            break;
                         }
                     }
+                    break;
                 }
                 default: {
                     return [{isHtml: false, result: "mkdir: loading"}];
-                    break;
                 }
             }
         }
