@@ -81,7 +81,7 @@
         el: "#shellMessage",
         data: {
             name: "Arect Shell",
-            version: "0.6.0",
+            version: "0.6.1",
             isBeta: true
         }
     })
@@ -273,36 +273,36 @@
                     }
                 }
                 switch (command[0]) {
-                    case "about": {
-                        commandHistory.results.push(c_about.about(command));
+                    case "screenfetch": {
+                        commandHistory.results.push(c_screenfetch.main(command));
                         break;
                     }
                     case "ls": {
-                        commandHistory.results.push(c_ls.ls(command));
+                        commandHistory.results.push(c_ls.main(command));
                         break;
                     }
                     case "cd": {
-                        commandHistory.results.push(c_cd.cd(command));
+                        commandHistory.results.push(c_cd.main(command));
                         break;
                     }
                     case "clear": {
-                        c_clear.clear();
+                        c_clear.main();
                         break;
                     }
                     case "shutdown": {
-                        commandHistory.results.push(c_shutdown.shutdown(command));
+                        commandHistory.results.push(c_shutdown.main(command));
                         break;
                     }
                     case "cat": {
-                        commandHistory.results.push(c_cat.cat(command));
+                        commandHistory.results.push(c_cat.main(command));
                         break;
                     }
                     case "html": {
-                        commandHistory.results.push(c_html.html(command));
+                        commandHistory.results.push(c_html.main(command));
                         break;
                     }
                     case "help": {
-                        commandHistory.results.push(c_help.help(command));
+                        commandHistory.results.push(c_help.main(command));
                         break;
                     }
                     case "mkdir": {

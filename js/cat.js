@@ -1,6 +1,6 @@
 var c_cat = new Vue({
     methods: {
-        cat: function(arr) {
+        main: function(arr) {
             switch (arr.length) {
                 case 1: {
                     return [{isHtml: true, result: "<span style = \"color: #E91E63;\">喵~</span>"}];

@@ -1,6 +1,6 @@
 var c_html = new Vue({
     methods: {
-        html: function(arr) {
+        main: function(arr) {
             switch (arr.length) {
                 case 1: {
                     return [{isHtml: false, result: ""}];

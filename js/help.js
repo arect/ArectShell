@@ -21,6 +21,12 @@ var c_help = new Vue({
         },{
             name: "shutdown",
             describe: "Usage: shutdown<br />Switch to blank page."
+        },{
+            name: "screenfetch",
+            describe: "Display system information."
+        },{
+            name: "mkdir",
+            describe: "Usage: mkdir DIRECTORY<br />Create the DIRECTORY, if they do not already exist."
         }]
     },
     methods: {
@@ -32,7 +38,7 @@ var c_help = new Vue({
             }
             return [{isHtml: false, result: "-ArectShell: command not found: " + name}];
         },
-        help: function(arr) {
+        main: function(arr) {
             let temp = "<div>You can use following commands:</div>";
             for (let i of this.commands) {
                 temp += "<div class = \"helpItem\">" + i.name + "</div>";

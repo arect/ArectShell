@@ -1,6 +1,6 @@
 var c_cd = new Vue({
     methods: {
-        cd: function(arr) {
+        main: function(arr) {
             switch (arr.length) {
                 case 1: {
                     return [{isHtml: false, result: ""}];

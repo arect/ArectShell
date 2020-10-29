@@ -1,6 +1,6 @@
 var c_ls = new Vue({
     methods: {
-        ls: function(arr) {
+        main: function(arr) {
             switch (arr.length) {
                 case 1: {
                     let temp = prompt.getCurrentLocation();
