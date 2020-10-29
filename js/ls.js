@@ -6,14 +6,14 @@ var c_ls = new Vue({
                     let temp = prompt.getCurrentLocation();
                     let tempStr = ""
                     for (let i of temp.content) {
-                        if (i.isDir == true) {
+                        if (i.isDir === true) {
                             tempStr += "<div class = \"helpItem ls_dir\">" + i.name + "</div>";
                         }
                         else {
                             tempStr += "<div class = \"helpItem\">" + i.name + "</div>";
                         }
                     }
-                    if (tempStr == "") {
+                    if (tempStr === "") {
                         tempStr += "<br />";
                     }
                     return [{isHtml: true, result: tempStr}];
@@ -23,8 +23,8 @@ var c_ls = new Vue({
                     for (let i = 1; i < arr.length; i++) {
                         let temp = prompt.enterTargetDir(arr[i]);
                         let tempStr = "";
-                        if (Object.prototype.toString.call(temp) == "[object String]") {
-                            if (temp == "ERR_PERMISSION_DENIED") {
+                        if (Object.prototype.toString.call(temp) === "[object String]") {
+                            if (temp === "ERR_PERMISSION_DENIED") {
                                 result.push({isHtml: false, result: "ls: cannot open directory \'" + arr[i] + "\': Permission denied"});
                                 continue;
                             }
@@ -39,7 +39,7 @@ var c_ls = new Vue({
                             tempStr += arr[i] + ":<br />";
                         }
                         for (let ii of temp.content) {
-                            if (ii.isDir == true) {
+                            if (ii.isDir === true) {
                                 tempStr += "<div class = \"helpItem ls_dir\">" + ii.name + "</div>";
                             }
                             else {

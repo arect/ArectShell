@@ -26,7 +26,7 @@ var c_help = new Vue({
     methods: {
         helpBy__help: function(name) {
             for (let i of this.commands) {
-                if (i.name == name) {
+                if (i.name === name) {
                     return [{isHtml: true, result: i.describe}];
                 }
             }

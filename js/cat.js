@@ -4,14 +4,13 @@ var c_cat = new Vue({
             switch (arr.length) {
                 case 1: {
                     return [{isHtml: true, result: "<span style = \"color: #E91E63;\">喵~</span>"}];
-                    break;
                 }
                 default: {
                     let result = [];
                     for (let i = 1; i < arr.length; i++) {
                         let temp = prompt.enterTargetDir(arr[i]);
-                        if (Object.prototype.toString.call(temp) == "[object String]") {
-                            if (temp == "ERR_PERMISSION_DENIED") {
+                        if (Object.prototype.toString.call(temp) === "[object String]") {
+                            if (temp === "ERR_PERMISSION_DENIED") {
                                 result.push({isHtml: false, result: "cat: " + arr[i] + ": Permission denied"});
                                 continue;
                             }

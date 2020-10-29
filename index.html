@@ -1,4 +1,4 @@
-<html>
+<html lang="zh">
 <head>
     <meta
             name = "viewport"
@@ -81,7 +81,7 @@
         el: "#shellMessage",
         data: {
             name: "Arect Shell",
-            version: "0.5.0",
+            version: "0.6.0",
             isBeta: true
         }
     })
@@ -95,27 +95,20 @@
         },
         methods: {
             toString_: function() {
-                if (mode.sign != "") {
+                if (mode.sign !== "") {
                     return mode.content;
                 }
                 return this.toString = "[" + this.username + "@" + this.device + " " + this.directory[this.directory.length - 1] + "] " + this.authority;
             },
-            getFullLocation: function() {
-                let temp = "~";
-                for (let index = 1; index < this.directory.length; index++) {
-                    temp += "/" + this.directory[index];
-                }
-                return temp;
-            },
             getCurrentLocation: function() {
                 let temp = d_fileTree.fileTree;
                 for (let i of temp) {
-                    if (i.owner = this.username) {
+                    if (i.owner === this.username) {
                         temp = i;
                         for (let ii = 1; ii < this.directory.length; ii++) {
                             let isFound = false;
                             for (let iii of temp.content) {
-                                if (iii.name == this.directory[ii]) {
+                                if (iii.name === this.directory[ii]) {
                                     isFound = true;
                                     temp = iii;
                                     break;
@@ -156,42 +149,42 @@
             },
             getUserDir: function() {
                 for (let i of d_fileTree.fileTree) {
-                    if (i.owner == this.username) {
+                    if (i.owner === this.username) {
                         return i;
                     }
                 }
                 return "ERR_IN_FINDING_USER_DIR";
             },
             enterTargetDir: function(arr) {
-                if (Object.prototype.toString.call(arr) == "[object String]") {
+                if (Object.prototype.toString.call(arr) === "[object String]") {
                     arr = arr.trim().replace(new RegExp('^\\/+|\\/+$', 'g'), '').split("/");
                 }
-                if (Object.prototype.toString.call(arr) != "[object Array]") {
+                if (Object.prototype.toString.call(arr) !== "[object Array]") {
                     console.log("ERR_PARAMETER_TYPE_ERROR");
                     return "ERR_NO_SUCH_DIR_OR_FILE";
                 }
                 // 相对路径
                 let temp = this.getCurrentLocation();
                 let isFound = false;
-                if (arr.length == 0) {
+                if (arr.length === 0) {
                     return temp;
                 }
                 for (let i of arr) {
                     isFound = false;
-                    if (i == ".") {
+                    if (i === ".") {
                         isFound = true;
                         continue;
                     }
-                    if (i == "..") {
+                    if (i === "..") {
                         temp = this.findFather(temp);
-                        if (Object.prototype.toString.call(temp) == "[object String]") {
+                        if (Object.prototype.toString.call(temp) === "[object String]") {
                             return temp;
                         }
                         isFound = true;
                         continue;
                     }
                     for (let ii of temp.content) {
-                        if (i == ii.name) {
+                        if (i === ii.name) {
                             isFound = true;
                             temp = ii;
                             break;
@@ -205,31 +198,31 @@
                     return temp;
                 }
                 else {
-                    if (arr[0] == "~") {
+                    if (arr[0] === "~") {
                         isFound = true;
                         arr.shift();
                     } else return "ERR_NO_SUCH_DIR_OR_FILE";
                     temp = this.getUserDir();
-                    if (temp == "ERR_IN_FINDING_USER_DIR") {
+                    if (temp === "ERR_IN_FINDING_USER_DIR") {
                         console.log(temp);
                         return "ERR_IN_FINDING_USER_DIR";
                     }
                     for (let i of arr) {
                         isFound = false;
-                        if (i == ".") {
+                        if (i === ".") {
                             isFound = true;
                             continue;
                         }
-                        if (i == "..") {
+                        if (i === "..") {
                             temp = this.findFather(temp);
-                            if (Object.prototype.toString.call(temp) == "[object String]") {
+                            if (Object.prototype.toString.call(temp) === "[object String]") {
                                 return temp;
                             }
                             isFound = true;
                             continue;
                         }
                         for (let ii of temp.content) {
-                            if (i == ii.name) {
+                            if (i === ii.name) {
                                 isFound = true;
                                 temp = ii;
                                 break;
@@ -273,7 +266,7 @@
             },
             select: function(command) {
                 if (command.length > 1) {
-                    if (command[1] == "--help") {
+                    if (command[1] === "--help") {
                         commandHistory.results.push(c_help.helpBy__help(command[0]));
                         this.$refs.command.innerHTML = "";
                         return;
@@ -327,7 +320,7 @@
                 }
             },
             inputFocus: function(b) {
-                if(this.$refs.command.innerText == ''){
+                if(this.$refs.command.innerText === ''){
                     this.isFocused = b;
                 }
             }

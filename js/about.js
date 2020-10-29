@@ -32,12 +32,12 @@ var c_about = new Vue({
             temp += "Kernel:&ensp;" + this.getBrowser() + "<br />";
             temp += "Uptime:&ensp;" + this.uptime + "<br />";
             temp += "Shell:&ensp;" + shell.name + "-" + shell.version + "<br />";
-            temp += "Project url:<a href = " + this.url + ">" + this.url + "</a><br />";
+            temp += "Project url:<a href = " + this.url + ">" + this.url + "</a><br /></div>";
             return [{isHtml: true, result: temp}];
         },
         // 吕化冬 https://blog.csdn.net/weixin_40656367/article/details/82908714
         getBrowser: function(n) {  
-            var ua = navigator.userAgent.toLowerCase(),  
+            let ua = navigator.userAgent.toLowerCase(),
                 s,  
                 name = '',  
                 ver = 0;  
@@ -60,7 +60,7 @@ var c_about = new Vue({
                 name = bname;  
                 ver = bver;  
             }  
-            return (n == 'n' ? name : (n == 'v' ? ver : name + "-" + ver));  
+            return (n === 'n' ? name : (n === 'v' ? ver : name + "-" + ver));
         },
     }
 })
