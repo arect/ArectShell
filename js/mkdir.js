@@ -39,6 +39,11 @@ var c_mkdir = new Vue({
                                     }
                                 }
                             }
+                            for (let i of prompt.getCurrentLocation().content) {
+                                if (i.name === target) {
+                                    return [{isHtml: false, result: "mkdir: cannot create directory `" + target + "`: File exists"}];
+                                }
+                            }
                             prompt.getCurrentLocation().content.push({
                                 name: target,
                                 isDir: true,
@@ -75,7 +80,7 @@ var c_mkdir = new Vue({
                             }
                             for (let i of loc.content) {
                                 if (i.name === target) {
-                                    return [{isHtml: false, result: "mkdir: cannot create directory ‘" + target + "’: File exists"}];
+                                    return [{isHtml: false, result: "mkdir: cannot create directory `" + target + "`: File exists"}];
                                 }
                             }
                             loc.content.push({
