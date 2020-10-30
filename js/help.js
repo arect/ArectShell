@@ -7,9 +7,9 @@ let c_help = new Vue({
         },
     },
     methods: {
-        main: function(arr) {
+        main: function() {
             let temp = "<div>You can use following commands:</div>";
-            for (let i of this.commands) {
+            for (let i of inputCommand.commands) {
                 temp += "<div class = \"helpItem\">" + i.name + "</div>";
             }
             return [{isHtml: true, result: temp}];
@@ -19,9 +19,6 @@ let c_help = new Vue({
                 {isHtml: false, result: "Usage: " + this.name + " " + this.usage},
                 {isHtml: false, result: this.description}
             ];
-        },
-        test: function () {
-            console.log(commands.command);
         }
     }
 });
