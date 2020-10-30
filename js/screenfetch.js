@@ -1,5 +1,8 @@
-var c_screenfetch = new Vue({
+let c_screenfetch = new Vue({
     data:{
+        name: "screenfetch",
+        usage: "",
+        description: "Display system information.",
         logo: [
             "       ,]@@@@@@@O\\`      ",
             "    ./@@@@@@@@@@@@@@\\.   ",
@@ -62,5 +65,11 @@ var c_screenfetch = new Vue({
             }  
             return (n === 'n' ? name : (n === 'v' ? ver : name + "-" + ver));
         },
+        help: function () {
+            return [
+                {isHtml: false, result: "Usage: " + this.name + " " + this.usage},
+                {isHtml: false, result: this.description}
+            ];
+        }
     }
 })

@@ -1,5 +1,8 @@
-var c_mkdir = new Vue({
+let c_mkdir = new Vue({
     data:{
+        name: "mkdir",
+        usage: "DIRECTORY",
+        description: "Create the DIRECTORY, if they do not already exist.",
         banList: [
             "<",
             ">",
@@ -100,6 +103,12 @@ var c_mkdir = new Vue({
                     return [{isHtml: false, result: "mkdir: loading"}];
                 }
             }
+        },
+        help: function () {
+            return [
+                {isHtml: false, result: "Usage: " + this.name + " " + this.usage},
+                {isHtml: false, result: this.description}
+            ];
         }
     }
 })

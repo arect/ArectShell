@@ -1,4 +1,9 @@
-var c_ls = new Vue({
+let c_ls = new Vue({
+    data: {
+        name: "ls",
+        usage: "[FILE/DIR]...",
+        description: "List the FILEs (the current directory by default)."
+    },
     methods: {
         main: function(arr) {
             switch (arr.length) {
@@ -51,6 +56,12 @@ var c_ls = new Vue({
                     return result;
                 }
             }
+        },
+        help: function () {
+            return [
+                {isHtml: false, result: "Usage: " + this.name + " " + this.usage},
+                {isHtml: false, result: this.description}
+            ];
         }
     }
 });

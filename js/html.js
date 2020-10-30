@@ -1,4 +1,9 @@
-var c_html = new Vue({
+let c_html = new Vue({
+    data: {
+        name: "html",
+        usage: "[FILE]...",
+        description: "Parse the HTML FILE(s)."
+    },
     methods: {
         main: function(arr) {
             switch (arr.length) {
@@ -28,6 +33,12 @@ var c_html = new Vue({
                     return result;
                 }
             }
+        },
+        help: function () {
+            return [
+                {isHtml: false, result: "Usage: " + this.name + " " + this.usage},
+                {isHtml: false, result: this.description}
+            ];
         }
     }
 });

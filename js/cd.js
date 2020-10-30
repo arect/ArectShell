@@ -1,4 +1,9 @@
-var c_cd = new Vue({
+let c_cd = new Vue({
+    data: {
+        name: "cd",
+        usage: "[DIR]",
+        description: "Switch to current working directory."
+    },
     methods: {
         main: function(arr) {
             switch (arr.length) {
@@ -36,6 +41,12 @@ var c_cd = new Vue({
                     return [{isHtml: false, result: "cd: string not in pwd: " + arr[1]}];
                 }
             }
+        },
+        help: function () {
+            return [
+                {isHtml: false, result: "Usage: " + this.name + " " + this.usage},
+                {isHtml: false, result: this.description}
+            ];
         }
     }
 });

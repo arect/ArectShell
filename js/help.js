@@ -1,49 +1,27 @@
-var c_help = new Vue({
+let c_help = new Vue({
     data: {
-        commands: [{
-            name: "cat",
-            describe: "Usage: cat [FILE]...<br />Concatenate FILE(s) to standard output."
-        },{
-            name: "cd",
-            describe: "cd: no such file or directory: --help<br />Just a joke."
-        },{
-            name: "clear",
-            describe: "Usage: clear<br />Clear history."
-        },{
+        data: {
             name: "help",
-            describe: "Usage: help<br />List the commands which I want you to see."
-        },{
-            name: "html",
-            describe: "Usage: html [FILE]...<br />Parse the HTML FILE(s)."
-        },{
-            name: "ls",
-            describe: "Usage: ls [FILE/DIR]...<br />List the FILEs (the current directory by default)."
-        },{
-            name: "shutdown",
-            describe: "Usage: shutdown<br />Switch to blank page."
-        },{
-            name: "screenfetch",
-            describe: "Display system information."
-        },{
-            name: "mkdir",
-            describe: "Usage: mkdir DIRECTORY<br />Create the DIRECTORY, if they do not already exist."
-        }]
+            usage: "[COMMAND]",
+            description: "List the commands which I want you to see."
+        },
     },
     methods: {
-        helpBy__help: function(name) {
-            for (let i of this.commands) {
-                if (i.name === name) {
-                    return [{isHtml: true, result: i.describe}];
-                }
-            }
-            return [{isHtml: false, result: "-ArectShell: command not found: " + name}];
-        },
         main: function(arr) {
             let temp = "<div>You can use following commands:</div>";
             for (let i of this.commands) {
                 temp += "<div class = \"helpItem\">" + i.name + "</div>";
             }
             return [{isHtml: true, result: temp}];
+        },
+        help: function () {
+            return [
+                {isHtml: false, result: "Usage: " + this.name + " " + this.usage},
+                {isHtml: false, result: this.description}
+            ];
+        },
+        test: function () {
+            console.log(commands.command);
         }
     }
 });

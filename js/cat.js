@@ -1,4 +1,9 @@
-var c_cat = new Vue({
+let c_cat = new Vue({
+    data: {
+        name: "cat",
+        usage: "[FILE]...",
+        description: "Concatenate FILE(s) to standard output."
+    },
     methods: {
         main: function(arr) {
             switch (arr.length) {
@@ -28,6 +33,12 @@ var c_cat = new Vue({
                     return result;
                 }
             }
+        },
+        help: function () {
+            return [
+                {isHtml: false, result: "Usage: " + this.name + " " + this.usage},
+                {isHtml: false, result: this.description}
+            ];
         }
     }
 });

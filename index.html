@@ -27,8 +27,8 @@
         Hi~ <br />
         This page was inspired by <a href = "https://axton.cc" target = "_blank">axton</a>.<br />
         <span style = "color: #F44336;">
-                    Known issue: Sometimes the cursor does not appear when clicking "input here".
-                </span>
+            Known issue: Sometimes the cursor does not appear when clicking "input here".
+        </span>
     </div>
     <div class = "introduce" id = "shellMessage">
         {{ name }} {{ version }}
@@ -56,12 +56,12 @@
                 v-on:keydown.enter = "exec()"
                 ref = "command"
         >
-                </span>
+        </span>
     </div>
 </div>
 </body>
 <script>
-    var mode = new Vue({
+    let mode = new Vue({
         data: {
             sign: "",
             content: "",
@@ -77,15 +77,15 @@
             }
         }
     });
-    var shell = new Vue({
+    let shell = new Vue({
         el: "#shellMessage",
         data: {
             name: "Arect Shell",
-            version: "0.6.2",
+            version: "0.7.2",
             isBeta: true
         }
     })
-    var prompt = new Vue ({
+    let prompt = new Vue ({
         el: "#prompt",
         data: {
             username: "visitor",
@@ -240,7 +240,7 @@
             }
         }
     });
-    var commandHistory = new Vue ({
+    let commandHistory = new Vue ({
         el: "#commandHistory",
         data: {
             prompts: [],
@@ -248,13 +248,25 @@
             results: [],
         }
     });
-    var inputCommand = new Vue ({
+    let inputCommand = new Vue ({
         el: "#inputCommand",
         data: {
             isFocused: false,
+            command: [
+                {name: "cat", variable: c_cat},
+                {name: "cd", variable: c_cd},
+                {name: "clear", variable: c_clear},
+                {name: "help", variable: c_help},
+                {name: "html", variable: c_html},
+                {name: "ls", variable: c_ls},
+                {name: "mkdir", variable: c_mkdir},
+                {name: "screenfetch", variable: c_screenfetch},
+                {name: "shutdown", variable: c_shutdown}
+            ]
         },
         methods: {
             exec: function() {
+                // 输入一个命令按下回车，阻止产生<br />，如果有更好的办法就好了。
                 event.preventDefault();
                 if (!mode.isActive) {
                     let command = this.$refs.command.innerText.trim().split(/\s+/);
@@ -265,57 +277,17 @@
                 }
             },
             select: function(command) {
-                if (command.length > 1) {
-                    if (command[1] === "--help") {
-                        commandHistory.results.push(c_help.helpBy__help(command[0]));
-                        this.$refs.command.innerHTML = "";
-                        return;
-                    }
-                }
-                switch (command[0]) {
-                    case "screenfetch": {
-                        commandHistory.results.push(c_screenfetch.main(command));
-                        break;
-                    }
-                    case "ls": {
-                        commandHistory.results.push(c_ls.main(command));
-                        break;
-                    }
-                    case "cd": {
-                        commandHistory.results.push(c_cd.main(command));
-                        break;
-                    }
-                    case "clear": {
-                        c_clear.main();
-                        break;
-                    }
-                    case "shutdown": {
-                        commandHistory.results.push(c_shutdown.main(command));
-                        break;
-                    }
-                    case "cat": {
-                        commandHistory.results.push(c_cat.main(command));
-                        break;
-                    }
-                    case "html": {
-                        commandHistory.results.push(c_html.main(command));
-                        break;
-                    }
-                    case "help": {
-                        commandHistory.results.push(c_help.main(command));
-                        break;
-                    }
-                    case "mkdir": {
-                        commandHistory.results.push(c_mkdir.main(command));
-                        break;
-                    }
-                    case "": {
-                        commandHistory.results.push([{isHtml: false, result: ""}]);
-                        break;
-                    }
-                    default: {
-                        commandHistory.results.push([{isHtml: false, result: "-ArectShell: command not found: " + command[0]}]);
-                        break;
+                for (let i of this.command) {
+                    if (command[0] === i.name) {
+                        console.log(i.name);
+                        if (command.length > 1) {
+                            if (command[1] === "--help") {
+                                commandHistory.results.push(i.variable.help());
+                                this.$refs.command.innerHTML = "";
+                                return;
+                            }
+                        }
+                        commandHistory.results.push(i.variable.main(command));
                     }
                 }
             },
@@ -326,7 +298,7 @@
             }
         }
     });
-    var d_fileTree = new Vue({
+    let d_fileTree = new Vue({
         data: {
             fileTree: [{
                 name: "~",
