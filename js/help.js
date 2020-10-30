@@ -9,7 +9,7 @@ let c_help = new Vue({
     methods: {
         main: function() {
             let temp = "<div>You can use following commands:</div>";
-            for (let i of inputCommand.commands) {
+            for (let i of inputCommand.command) {
                 temp += "<div class = \"helpItem\">" + i.name + "</div>";
             }
             return [{isHtml: true, result: temp}];

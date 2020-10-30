@@ -45,7 +45,7 @@
     </div>
 </div>
 <div class = "commandMain">
-    <div id = "commandInput" spellcheck = "false" autocomplete = "off" autocorrect = "off">
+    <div id = "commandInput" spellcheck = "false" autocomplete = "off">
         <span id = "prompt" v-text = "toString_()"></span>
         <span
                 contenteditable = "true"
@@ -81,7 +81,7 @@
         el: "#shellMessage",
         data: {
             name: "Arect Shell",
-            version: "0.7.2",
+            version: "0.7.1",
             isBeta: true
         }
     })
@@ -279,7 +279,6 @@
             select: function(command) {
                 for (let i of this.command) {
                     if (command[0] === i.name) {
-                        console.log(i.name);
                         if (command.length > 1) {
                             if (command[1] === "--help") {
                                 commandHistory.results.push(i.variable.help());
@@ -288,8 +287,10 @@
                             }
                         }
                         commandHistory.results.push(i.variable.main(command));
+                        return;
                     }
                 }
+                commandHistory.results.push([{isHtml: false, result: "-ArectShell: command not found: " + command[0]}]);
             },
             inputFocus: function(b) {
                 if(this.$refs.command.innerText === ''){

@@ -5,7 +5,7 @@ let c_shutdown = new Vue({
         description: "Switch to blank page.",
     },
     methods: {
-        main: function(arr) {
+        main: function() {
             window.location.href = "about:blank";
             return [{isHtml: false, result: ""}];
         },
