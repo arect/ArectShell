@@ -2,14 +2,14 @@ let c_clear = new Vue({
     data: {
         name: "clear",
         usage: "",
-        description: "Clear history."
+        description: "Clear the terminal screen."
     },
     methods: {
         main: function() {
             commandHistory.prompts.splice(0,commandHistory.prompts.length);
             commandHistory.commands.splice(0,commandHistory.commands.length);
             commandHistory.results.splice(0,commandHistory.results.length);
-            return [{isHtml: false, result: ""}];
+            return "$EMPTY$";
         },
         help: function () {
             return [

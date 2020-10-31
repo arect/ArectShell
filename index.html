@@ -3,16 +3,20 @@
     <meta
             name = "viewport"
             content = "width = device-width, initial-scale = 1.0, maximum-scale = 1.0, user-scalable = no"
-    >
+    />
+    <meta
+            http-equiv="Content-Type"
+            content="text/html; charset=utf-8"
+    />
     <link
             rel = "stylesheet"
             type = "text/css"
             href = "./css/style.css"
-    >
+    />
     <link
         rel="stylesheet"
         href="https://fonts.font.im/css?family=Oxygen+Mono"
-    >
+    />
     <script
             src="./js/vue.js"
     ></script>
@@ -81,7 +85,7 @@
         el: "#shellMessage",
         data: {
             name: "Arect Shell",
-            version: "0.7.3",
+            version: "0.8.0",
             isBeta: true
         }
     })
@@ -237,6 +241,13 @@
                     }
                 }
                 return "ERR_NO_SUCH_DIR_OR_FILE";
+            },
+            getFullDir: function () {
+                let temp = "";
+                for (let i of this.directory) {
+                    temp += "/" + i;
+                }
+                return temp;
             }
         }
     });
@@ -256,6 +267,7 @@
                 {name: "cat", variable: c_cat},
                 {name: "cd", variable: c_cd},
                 {name: "clear", variable: c_clear},
+                {name: "echo", variable: c_echo},
                 {name: "help", variable: c_help},
                 {name: "html", variable: c_html},
                 {name: "ls", variable: c_ls},
@@ -287,7 +299,10 @@
                                 return;
                             }
                         }
-                        commandHistory.results.push(i.variable.main(command));
+                        let temp = i.variable.main(command);
+                        if (temp !== "$EMPTY$") {
+                            commandHistory.results.push(i.variable.main(command));
+                        }
                         return;
                     }
                 }
@@ -322,5 +337,19 @@
             }]
         }
     });
+    let d_variables = new Vue({
+        data: {
+            local: [
+                {name: "0", value: "-ArectShell"},
+                {name: "PWD", value: prompt.getFullDir()},
+                {name: "DEVICE", value: prompt.device},
+                {name: "SHELL", value: "/usr/bin/ArectShell"},
+                {name: "USER", value: prompt.username},
+                {name: "USERNAME", value: prompt.username},
+                {name: "ARECT", value: "A very handsome man."}
+            ],
+            user: []
+        }
+    })
 </script>
 </html>

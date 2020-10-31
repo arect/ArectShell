@@ -2,7 +2,7 @@ let c_screenfetch = new Vue({
     data:{
         name: "screenfetch",
         usage: "",
-        description: "Display system information.",
+        description: "The bash screenshot information tool.",
         logo: [
             "       ,]@@@@@@@O\\`      ",
             "    ./@@@@@@@@@@@@@@\\.   ",
