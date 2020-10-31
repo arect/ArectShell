@@ -95,6 +95,13 @@
                     return mode.content;
                 }
                 return this.toString = "[" + this.username + "@" + this.device + " " + this.directory[this.directory.length - 1] + "] " + this.authority;
+            },
+            getFullDir: function () {
+                let temp = "";
+                for (let i of this.directory) {
+                    temp += "/" + i;
+                }
+                return temp;
             }
         }
     });
@@ -102,11 +109,11 @@
         el: "#shellMessage",
         data: {
             name: "Arect Shell",
-            version: "0.9.0",
+            version: "0.9.1",
             isBeta: true,
             local: [
                 {name: "0", value: "-ArectShell"},
-                {name: "PWD", value: this.getFullDir()},
+                {name: "PWD", value: prompt.getFullDir()},
                 {name: "DEVICE", value: prompt.device},
                 {name: "SHELL", value: "/usr/bin/ArectShell"},
                 {name: "USER", value: prompt.username},
@@ -270,13 +277,6 @@
                     }
                 }
                 return "ERR_NO_SUCH_DIR_OR_FILE";
-            },
-            getFullDir: function () {
-                let temp = "";
-                for (let i of prompt.directory) {
-                    temp += "/" + i;
-                }
-                return temp;
             }
         }
     });
