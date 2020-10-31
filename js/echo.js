@@ -10,7 +10,7 @@ let c_echo = new Vue({
             for (let i = 1; i < arr.length; i++) {
                 if (arr[i].substr(0, 1) === "$") {
                     let targetVar = arr[i].substr(1, arr[i].length);
-                    for (let ii of d_variables.local) {
+                    for (let ii of shell.local) {
                         if (ii.name === targetVar) {
                             temp += ii.value+ " ";
                         }

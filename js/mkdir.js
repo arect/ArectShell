@@ -42,12 +42,12 @@ let c_mkdir = new Vue({
                                     }
                                 }
                             }
-                            for (let i of prompt.getCurrentLocation().content) {
+                            for (let i of shell.getCurrentLocation().content) {
                                 if (i.name === target) {
                                     return [{isHtml: false, result: "mkdir: cannot create directory `" + target + "`: File exists"}];
                                 }
                             }
-                            prompt.getCurrentLocation().content.push({
+                            shell.getCurrentLocation().content.push({
                                 name: target,
                                 isDir: true,
                                 content: [],
@@ -66,7 +66,7 @@ let c_mkdir = new Vue({
                                     }
                                 }
                             }
-                            let loc = prompt.enterTargetDir(arr);
+                            let loc = shell.enterTargetDir(arr);
                             if (loc === "ERR_NO_SUCH_DIR_OR_FILE") {
                                 let temp = "";
                                 for (let i of arr) {

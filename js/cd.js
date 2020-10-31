@@ -11,7 +11,7 @@ let c_cd = new Vue({
                     return [{isHtml: false, result: ""}];
                 }
                 case 2: {
-                    let temp = prompt.enterTargetDir(arr[1]);
+                    let temp = shell.enterTargetDir(arr[1]);
                     if (Object.prototype.toString.call(temp) === "[object String]") {
                         if (temp === "ERR_PERMISSION_DENIED") {
                             return [{isHtml: false, result: "cd: permission denied: " + arr[1]}];

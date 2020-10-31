@@ -13,7 +13,7 @@ let c_html = new Vue({
                 default: {
                     let result = [];
                     for (let i = 1; i < arr.length; i++) {
-                        let temp = prompt.enterTargetDir(arr[i]);
+                        let temp = shell.enterTargetDir(arr[i]);
                         if (Object.prototype.toString.call(temp) === "[object String]") {
                             if (temp === "ERR_PERMISSION_DENIED") {
                                 result.push({isHtml: false, result: "html: " + arr[i] + ": Permission denied"});

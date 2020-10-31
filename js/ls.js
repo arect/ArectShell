@@ -8,7 +8,7 @@ let c_ls = new Vue({
         main: function(arr) {
             switch (arr.length) {
                 case 1: {
-                    let temp = prompt.getCurrentLocation();
+                    let temp = shell.getCurrentLocation();
                     let tempStr = ""
                     for (let i of temp.content) {
                         if (i.isDir === true) {
@@ -26,7 +26,7 @@ let c_ls = new Vue({
                 default: {
                     let result = [];
                     for (let i = 1; i < arr.length; i++) {
-                        let temp = prompt.enterTargetDir(arr[i]);
+                        let temp = shell.enterTargetDir(arr[i]);
                         let tempStr = "";
                         if (Object.prototype.toString.call(temp) === "[object String]") {
                             if (temp === "ERR_PERMISSION_DENIED") {
