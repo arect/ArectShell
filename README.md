@@ -13,6 +13,7 @@
 |cat||
 |cd||
 |clear||
+|echo|甚至还有一些变量|
 |help|例如ls --help或者直接help|
 |html|类似于cat只不过是以html的形式输出|
 |ls||
