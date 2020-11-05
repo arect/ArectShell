@@ -88,7 +88,7 @@
         data: {
             username: "visitor",
             device: "kanofans_com",
-            directory: ["~"],
+            directory: ["home", "visitor"],
             authority: "$"
         },
         methods: {
@@ -96,7 +96,17 @@
                 if (mode.sign !== "") {
                     return mode.content;
                 }
-                return this.toString = "[" + this.username + "@" + this.device + " " + this.directory[this.directory.length - 1] + "] " + this.authority;
+                let dir;
+                if (this.directory.length === 0) {
+                    dir = "/";
+                }
+                else if (this.directory.length === 2 && this.directory[0] === "home" && this.directory[1] === this.username) {
+                    dir = "~";
+                }
+                else {
+                    dir = this.directory[this.directory.length - 1];
+                }
+                return this.toString = "[" + this.username + "@" + this.device + " " + dir + "] " + this.authority;
             },
             getFullDir: function () {
                 let temp = "";
@@ -104,14 +114,14 @@
                     temp += "/" + i;
                 }
                 return temp;
-            }
+            },
         }
     });
     let shell = new Vue({
         el: "#shellMessage",
         data: {
             name: "Arect Shell",
-            version: "0.9.3",
+            version: "0.10.0",
             isBeta: true,
             local: [
                 {name: "0", value: "-ArectShell"},
@@ -122,54 +132,81 @@
                 {name: "USERNAME", value: prompt.username},
                 {name: "ARECT", value: "A very handsome man."}
             ],
-            fileTree: [{
-                name: "~",
-                owner: "visitor",
+            fileTree: {
+                name: "/",
                 isDir: true,
-                content: [{
-                    name: "testDir",
+                owner: "sys",
+                permission: ["rw", "", ""],
+                content:[{
+                    name: "home",
                     isDir: true,
+                    owner: "sys",
+                    permission: ["rwx", "rx", "rx"],
                     content: [{
-                        name: "second.file",
-                        isDir: false,
-                        content: ["<h1 style = \"color: #999999\">第二个文件</h1>"]
+                        name: "visitor",
+                        owner: "visitor",
+                        permission: ["rwx", "rwx", ""],
+                        isDir: true,
+                        content: [{
+                            name: "testDir",
+                            isDir: true,
+                            owner: "visitor",
+                            permission: ["rwx", "rwx", "rx"],
+                            content: [{
+                                name: "second.file",
+                                isDir: false,
+                                owner: "visitor",
+                                permission: ["rwx", "rwx", "rx"],
+                                content: ["<h1 style = \"color: #999999\">第二个文件</h1>"]
+                            }]
+                        }, {
+                            name: "test.txt",
+                            isDir: false,
+                            owner: "visitor",
+                            permission: ["rwx", "rwx", "rx"],
+                            content: ["这是test.txt", "这是test.txt的第二行"]
+                        }]
                     }]
-                },{
-                    name: "test.txt",
+                }, {
+                    name: "hiddenfile",
+                    owner: "sys",
+                    permission: ["rwx", "rx", ""],
                     isDir: false,
-                    content: ["这是test.txt", "这是test.txt的第二行"]
+                    content: ["这是一个隐藏文件"]
                 }]
-            }]
+            }
         },
         methods: {
             getCurrentLocation: function() {
-                let temp = this.fileTree;
-                for (let i of temp) {
-                    if (i.owner === prompt.username) {
-                        temp = i;
-                        for (let ii = 1; ii < prompt.directory.length; ii++) {
-                            let isFound = false;
-                            for (let iii of temp.content) {
-                                if (iii.name === prompt.directory[ii]) {
-                                    isFound = true;
-                                    temp = iii;
-                                    break;
-                                }
-                            }
-                            if (!isFound) {
-                                return "ERR_NO_SUCH_DIR_OR_FILE";
-                            }
+                let loc = this.fileTree;
+                for (let i of prompt.directory) {
+                    let found = false;
+                    for (let ii of loc.content) {
+                        if (i === ii.name) {
+                            found = true;
+                            loc = ii;
+                            break;
                         }
-                        return temp;
+                    }
+                    if (!found) {
+                        if (prompt.directory.length === 0) {
+                            return this.fileTree;
+                        }
+                        console.error("[ArectShell] The user is in a directory that does not exist");
+                        console.error(prompt.directory);
+                        return "ERR_STAY_IN_A_WRONG_DIR";
                     }
                 }
-                return temp;
+                return loc;
             },
             findFather: function(child) {
                 let list = [];
-                for (let i of this.fileTree) {
+                if (child === this.fileTree) {
+                    return this.fileTree;
+                }
+                for (let i of this.fileTree.content) {
                     if (child === i) {
-                        return "ERR_PERMISSION_DENIED";
+                        return this.fileTree;
                     }
                     if (i.isDir) {
                         list.push(i);
@@ -188,98 +225,106 @@
                         }
                     }
                 }
+                return "ERR_CANNOT_FIND_FATHER";
             },
             getUserDir: function() {
-                for (let i of this.fileTree) {
-                    if (i.owner === prompt.username) {
-                        return i;
+                for (let i of this.fileTree.content) {
+                    if (i.name === "home") {
+                        for (let ii of i.content) {
+                            if (ii.name === prompt.username) {
+                                return ii;
+                            }
+                        }
                     }
                 }
-                return "ERR_IN_FINDING_USER_DIR";
+                return "ERR_CANNOT_GET_USER_HOME";
             },
             enterTargetDir: function(arr) {
+                let mark = false;
                 if (Object.prototype.toString.call(arr) === "[object String]") {
+                    if (arr.substr(0, 1) === "/") {
+                        mark = true;
+                    }
                     arr = arr.trim().replace(new RegExp('^\\/+|\\/+$', 'g'), '').split("/");
                 }
+                else mark = true;
                 if (Object.prototype.toString.call(arr) !== "[object Array]") {
-                    console.log("ERR_PARAMETER_TYPE_ERROR");
+                    console.error("ERR_PARAMETER_TYPE_ERROR");
                     return "ERR_NO_SUCH_DIR_OR_FILE";
                 }
-                // 相对路径
-                let temp = shell.getCurrentLocation();
-                let isFound = false;
-                if (arr.length === 0) {
-                    return temp;
+                let found = true;
+                // 相对当前路径
+                let nowLoc = this.getCurrentLocation();
+                if (arr[0] === "~") {
+                    arr.shift();
+                    nowLoc = this.getUserDir();
                 }
                 for (let i of arr) {
-                    isFound = false;
-                    if (i === ".") {
-                        isFound = true;
-                        continue;
-                    }
-                    if (i === "..") {
-                        temp = shell.findFather(temp);
-                        if (Object.prototype.toString.call(temp) === "[object String]") {
-                            return temp;
+                    found = false;
+                    for (let ii of nowLoc.content) {
+                        if (i === ".") {
+                            found = true;
+                            break;
                         }
-                        isFound = true;
-                        continue;
-                    }
-                    for (let ii of temp.content) {
+                        if (i === "..") {
+                            found = true;
+                            nowLoc = this.findFather(nowLoc);
+                            break;
+                        }
                         if (i === ii.name) {
-                            isFound = true;
-                            temp = ii;
+                            nowLoc = ii;
+                            found = true;
                             break;
                         }
                     }
-                    if (!isFound) {
+                    if (!found) {
                         break;
                     }
                 }
-                if (isFound) {
-                    return temp;
+                if (found) {
+                    return nowLoc;
                 }
-                else {
-                    if (arr[0] === "~") {
-                        isFound = true;
-                        arr.shift();
-                    } else return "ERR_NO_SUCH_DIR_OR_FILE";
-                    temp = this.getUserDir();
-                    if (temp === "ERR_IN_FINDING_USER_DIR") {
-                        console.log(temp);
-                        return "ERR_IN_FINDING_USER_DIR";
-                    }
+                // 绝对路径
+                if (mark) {
+                    nowLoc = this.fileTree;
+                    found = true;
                     for (let i of arr) {
-                        isFound = false;
-                        if (i === ".") {
-                            isFound = true;
-                            continue;
-                        }
-                        if (i === "..") {
-                            temp = this.findFather(temp);
-                            if (Object.prototype.toString.call(temp) === "[object String]") {
-                                return temp;
+                        found = false;
+                        for (let ii of nowLoc.content) {
+                            if (i === ".") {
+                                found = true;
+                                break;
                             }
-                            isFound = true;
-                            continue;
-                        }
-                        for (let ii of temp.content) {
+                            if (i === "..") {
+                                found = true;
+                                nowLoc = this.findFather(nowLoc);
+                                break;
+                            }
                             if (i === ii.name) {
-                                isFound = true;
-                                temp = ii;
+                                nowLoc = ii;
+                                found = true;
                                 break;
                             }
                         }
-                        if (!isFound) {
+                        if (!found) {
                             break;
                         }
                     }
-                    if (isFound) {
-                        return temp;
+                    if (found) {
+                        return nowLoc;
                     }
                 }
                 return "ERR_NO_SUCH_DIR_OR_FILE";
             },
+            permission: function (file) {
+                let i;
+                if (prompt.username === "root") {
+                    i = 0;
+                }else if (prompt.username === file.owner) {
+                    i = 1;
+                }else i = 2;
+                return file.permission[i];
+            }
         }
     });
     let commandHistory = new Vue ({

@@ -47,14 +47,19 @@ let c_mkdir = new Vue({
                                     return [{isHtml: false, result: "mkdir: cannot create directory `" + target + "`: File exists"}];
                                 }
                             }
-                            shell.getCurrentLocation().content.push({
-                                name: target,
-                                isDir: true,
-                                content: [],
-                            });
+                            if (shell.permission(shell.getCurrentLocation()).indexOf("w") !== -1) {
+                                shell.getCurrentLocation().content.push({
+                                    name: target,
+                                    isDir: true,
+                                    owner: prompt.username,
+                                    permission: ["rwx", "rwx", "rx"],
+                                    content: []
+                                });
+                            }
+                            else return [{isHtml: false, result: "mkdir: cannot create directory `" + target + "`: Permission denied"}];
                             return [{isHtml: false, result: ""}];
                         }
-                        case 2: {
+                        default: {
                             if (Object.prototype.toString.call(arr) === "[object String]") {
                                 arr = arr.trim().replace(new RegExp('^\\/+|\\/+$', 'g'), '').split("/");
                             }
@@ -86,20 +91,22 @@ let c_mkdir = new Vue({
                                     return [{isHtml: false, result: "mkdir: cannot create directory `" + target + "`: File exists"}];
                                 }
                             }
-                            loc.content.push({
-                                name: target,
-                                isDir: true,
-                                content: []
-                            })
+                            if (shell.permission(loc).indexOf("w") !== -1) {
+                                loc.content.push({
+                                    name: target,
+                                    isDir: true,
+                                    owner: prompt.username,
+                                    permission: ["rwx", "rwx", "rx"],
+                                    content: []
+                                });
+                            }
+                            else return [{isHtml: false, result: "mkdir: cannot create directory `" + target + "`: Permission denied"}];
                             return [{isHtml: false, result: ""}];
-                        }
-                        default:{
-                            return [{isHtml: false, result: "mkdir: cannot create multiple folders"}]
                         }
                     }
                 }
                 default: {
-                    return [{isHtml: false, result: "mkdir: loading"}];
+                    return [{isHtml: false, result: "mkdir: Does not support creating multiple folders at the same time"}];
                 }
             }
         },

@@ -17,24 +17,18 @@ let c_cd = new Vue({
                         if (temp === "ERR_PERMISSION_DENIED") {
                             return [{isHtml: false, result: "cd: permission denied: " + arr[1]}];
                         }
-                        return [{isHtml: false, result: "cd: no such file or directory: " + arr[1]}];
+                        else if (temp === "ERR_NO_SUCH_DIR_OR_FILE") {
+                            return [{isHtml: false, result: "cd: no such file or directory: " + arr[1]}];
+                        }
+                        else return [{isHtml: false, result: "cd: " + temp + ": " + arr[1]}];
                     }
                     if (!temp.isDir) {
                         return [{isHtml: false, result: "cd: not a directory: " + arr[1]}];
                     }
-                    let target = arr[1].replace(new RegExp('^\\/+|\\/+$', 'g'), '').split("/");
-                    if (target[0] === "~") {
-                        prompt.directory.splice(0,prompt.directory.length);
-                    }
-                    for (let i of target) {
-                        if (i === ".") {
-                            continue;
-                        }
-                        if (i === "..") {
-                            prompt.directory.pop();
-                            continue;
-                        }
-                        prompt.directory.push(i);
+                    prompt.directory.splice(0, prompt.directory.length);
+                    while (temp.name !== "/") {
+                        prompt.directory.unshift(temp.name);
+                        temp = shell.findFather(temp);
                     }
                     return [{isHtml: false, result: ""}];
                 }

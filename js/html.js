@@ -26,9 +26,12 @@ let c_html = new Vue({
                             result.push({isHtml: false, result: "html: " + arr[i] + ": Is a directory"});
                             continue;
                         }
-                        for (let ii of temp.content) {
-                            result.push({isHtml: true, result: ii});
+                        if (shell.permission(temp).indexOf("r") !== -1) {
+                            for (let ii of temp.content) {
+                                result.push({isHtml: true, result: ii});
+                            }
                         }
+                        else result.push({isHtml: false, result: "cat: " + arr[i] + ": Permission denied"});
                     }
                     return result;
                 }
