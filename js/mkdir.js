@@ -52,7 +52,7 @@ let c_mkdir = new Vue({
                                 isDir: true,
                                 content: [],
                             });
-                            break;
+                            return [{isHtml: false, result: ""}];
                         }
                         case 2: {
                             if (Object.prototype.toString.call(arr) === "[object String]") {
@@ -97,7 +97,6 @@ let c_mkdir = new Vue({
                             return [{isHtml: false, result: "mkdir: cannot create multiple folders"}]
                         }
                     }
-                    break;
                 }
                 default: {
                     return [{isHtml: false, result: "mkdir: loading"}];

@@ -34,7 +34,7 @@
             Known issue: Sometimes the cursor does not appear when clicking "input here".
         </span>
     </div>
-    <div class = "introduce" id = "shellMessage">
+    <div class = "introduce" id="shellMessage">
         {{ name }} {{ version }}
         <span v-if = "isBeta" style = "color: #FF9800">beta</span>
     </div>
@@ -58,6 +58,8 @@
                 v-on:focus = "inputFocus(true)"
                 v-on:blur = "inputFocus(false)"
                 v-on:keydown.enter = "exec()"
+                v-on:keydown.up = "lastCommand()"
+                v-on:keydown.down = "nextCommand()"
                 ref = "command"
         >
         </span>
@@ -109,7 +111,7 @@
         el: "#shellMessage",
         data: {
             name: "Arect Shell",
-            version: "0.9.1",
+            version: "0.9.2",
             isBeta: true,
             local: [
                 {name: "0", value: "-ArectShell"},
@@ -277,7 +279,7 @@
                     }
                 }
                 return "ERR_NO_SUCH_DIR_OR_FILE";
-            }
+            },
         }
     });
     let commandHistory = new Vue ({
@@ -305,12 +307,14 @@
                 {name: "screenfetch", variable: c_screenfetch},
                 {name: "shutdown", variable: c_shutdown},
                 {name: "template", variable: template}
-            ]
+            ],
+            commandAmount: commandHistory.commands.length
         },
         methods: {
             exec: function() {
                 // 输入一个命令按下回车，阻止产生<br />，如果有更好的办法就好了。
                 event.preventDefault();
+                this.commandAmount = commandHistory.commands.length;
                 if (!mode.isActive) {
                     let command = this.$refs.command.innerText.trim().split(/\s+/);
                     commandHistory.prompts.push(prompt.toString_());
@@ -331,7 +335,7 @@
                         }
                         let temp = i.variable.main(command);
                         if (temp !== "$EMPTY$") {
-                            commandHistory.results.push(i.variable.main(command));
+                            commandHistory.results.push(temp);
                         }
                         return;
                     }
@@ -342,6 +346,32 @@
                 if(this.$refs.command.innerText === ''){
                     this.isFocused = b;
                 }
+            },
+            lastCommand: function () {
+                if (this.commandAmount < 0) {
+                    this.commandAmount = 0;
+                }
+                if (commandHistory.commands.length === 0) {
+                    return;
+                }
+                if (this.commandAmount >= commandHistory.commands.length) {
+                    this.commandAmount = commandHistory.commands.length - 1;
+                }
+                this.$refs.command.innerHTML = commandHistory.commands[this.commandAmount];
+                this.commandAmount--;
+            },
+            nextCommand: function () {
+                if (this.commandAmount >= commandHistory.commands.length) {
+                    this.commandAmount = commandHistory.commands.length - 1;
+                }
+                if (commandHistory.commands.length === 0) {
+                    return;
+                }
+                if (this.commandAmount < 0) {
+                    this.commandAmount = 0;
+                }
+                this.$refs.command.innerHTML = commandHistory.commands[this.commandAmount];
+                this.commandAmount++;
             }
         }
     });
