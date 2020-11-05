@@ -8,6 +8,7 @@ let c_cd = new Vue({
         main: function(arr) {
             switch (arr.length) {
                 case 1: {
+                    this.main(["cd", "~"]);
                     return [{isHtml: false, result: ""}];
                 }
                 case 2: {
