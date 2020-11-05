@@ -206,7 +206,7 @@
                     return "ERR_NO_SUCH_DIR_OR_FILE";
                 }
                 // 相对路径
-                let temp = prompt.getCurrentLocation();
+                let temp = shell.getCurrentLocation();
                 let isFound = false;
                 if (arr.length === 0) {
                     return temp;
@@ -218,7 +218,7 @@
                         continue;
                     }
                     if (i === "..") {
-                        temp = prompt.findFather(temp);
+                        temp = shell.findFather(temp);
                         if (Object.prototype.toString.call(temp) === "[object String]") {
                             return temp;
                         }
@@ -244,7 +244,7 @@
                         isFound = true;
                         arr.shift();
                     } else return "ERR_NO_SUCH_DIR_OR_FILE";
-                    temp = prompt.getUserDir();
+                    temp = this.getUserDir();
                     if (temp === "ERR_IN_FINDING_USER_DIR") {
                         console.log(temp);
                         return "ERR_IN_FINDING_USER_DIR";
@@ -256,7 +256,7 @@
                             continue;
                         }
                         if (i === "..") {
-                            temp = prompt.findFather(temp);
+                            temp = this.findFather(temp);
                             if (Object.prototype.toString.call(temp) === "[object String]") {
                                 return temp;
                             }
