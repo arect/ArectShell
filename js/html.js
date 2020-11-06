@@ -26,7 +26,7 @@ let c_html = new Vue({
                             result.push({isHtml: false, result: "html: " + arr[i] + ": Is a directory"});
                             continue;
                         }
-                        if (shell.permission(temp).indexOf("r") !== -1) {
+                        if (shell.permission(temp).indexOf("x") !== -1) {
                             for (let ii of temp.content) {
                                 result.push({isHtml: true, result: ii});
                             }

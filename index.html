@@ -121,7 +121,7 @@
         el: "#shellMessage",
         data: {
             name: "Arect Shell",
-            version: "0.10.0",
+            version: "0.10.1",
             isBeta: true,
             local: [
                 {name: "0", value: "-ArectShell"},
@@ -153,7 +153,7 @@
                             owner: "visitor",
                             permission: ["rwx", "rwx", "rx"],
                             content: [{
-                                name: "second.file",
+                                name: "second.html",
                                 isDir: false,
                                 owner: "visitor",
                                 permission: ["rwx", "rwx", "rx"],
@@ -247,7 +247,13 @@
                     }
                     arr = arr.trim().replace(new RegExp('^\\/+|\\/+$', 'g'), '').split("/");
                 }
-                else mark = true;
+                else if (arr[0] === "/") {
+                    arr.shift();
+                    mark = true;
+                    if (arr.length === 0) {
+                        return this.fileTree;
+                    }
+                }
                 if (Object.prototype.toString.call(arr) !== "[object Array]") {
                     console.error("ERR_PARAMETER_TYPE_ERROR");
                     return "ERR_NO_SUCH_DIR_OR_FILE";
