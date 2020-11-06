@@ -36,7 +36,7 @@ let c_screenfetch = new Vue({
             temp += "Uptime:&ensp;" + this.uptime + "<br />";
             temp += "Shell:&ensp;" + shell.name + "-" + shell.version + "<br />";
             temp += "Project url:&ensp;<a href = " + this.url + ">" + this.url + "</a><br />";
-            temp += "Power by Javascript & Vue<br />";
+            temp += "Powered by Javascript & Vue<br />";
             temp += "Made with 💖<br /></div>";
             return [{isHtml: true, result: temp}];
         },
