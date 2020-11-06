@@ -124,17 +124,8 @@
         el: "#shellMessage",
         data: {
             name: "Arect Shell",
-            version: "0.11.0",
+            version: "0.11.1",
             isBeta: true,
-            local: [
-                {name: "0", value: "-ArectShell"},
-                {name: "PWD", value: prompt.getFullDir()},
-                {name: "DEVICE", value: prompt.device},
-                {name: "SHELL", value: "/usr/bin/ArectShell"},
-                {name: "USER", value: prompt.username},
-                {name: "USERNAME", value: prompt.username},
-                {name: "ARECT", value: "A very handsome man."}
-            ],
             fileTree: {
                 name: "/",
                 type: "dir",
@@ -182,6 +173,24 @@
                     permission: ["rwx", "rwx", ""],
                     type: "dir",
                     content: []
+                },{
+                    name: "usr",
+                    owner: "sys",
+                    permission: ["rwx", "rwx", ""],
+                    type: "dir",
+                    content: [{
+                        name: "bin",
+                        owner: "sys",
+                        permission: ["rwx", "rwx", ""],
+                        type: "dir",
+                        content: [{
+                            name: "Arect",
+                            owner: "sys",
+                            permission: ["rwx", "", ""],
+                            type: "exe",
+                            content: []
+                        }]
+                    }]
                 }]
             },
             users: [
