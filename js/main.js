@@ -9,4 +9,5 @@ document.write("<script type='text/javascript' src='./js/html.js'></script>");
 document.write("<script type='text/javascript' src='./js/ls.js'></script>");
 document.write("<script type='text/javascript' src='./js/screenfetch.js'></script>");
 document.write("<script type='text/javascript' src='./js/shutdown.js'></script>");
+document.write("<script type='text/javascript' src='./js/su.js'></script>");
 document.write("<script type='text/javascript' src='./js/template.js'></script>");

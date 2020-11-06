@@ -73,7 +73,7 @@ let c_mkdir = new Vue({
                     if (shell.permission(loc).indexOf("w") !== -1) {
                         loc.content.push({
                             name: target,
-                            isDir: true,
+                            type: "dir",
                             owner: prompt.username,
                             permission: ["rwx", "rwx", "rx"],
                             content: []

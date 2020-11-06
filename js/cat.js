@@ -22,7 +22,7 @@ let c_cat = new Vue({
                             result.push({isHtml: false, result: "cat: " + arr[i] + ": No such file or directory"});
                             continue;
                         }
-                        if (temp.isDir) {
+                        if (temp.type === "dir") {
                             result.push({isHtml: false, result: "cat: " + arr[i] + ": Is a directory"});
                             continue;
                         }

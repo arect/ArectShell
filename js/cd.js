@@ -22,7 +22,7 @@ let c_cd = new Vue({
                         }
                         else return [{isHtml: false, result: "cd: " + temp + ": " + arr[1]}];
                     }
-                    if (!temp.isDir) {
+                    if (temp.type !== "dir") {
                         return [{isHtml: false, result: "cd: not a directory: " + arr[1]}];
                     }
                     prompt.directory.splice(0, prompt.directory.length);

@@ -103,6 +103,9 @@
                 else if (this.directory.length === 2 && this.directory[0] === "home" && this.directory[1] === this.username) {
                     dir = "~";
                 }
+                else if (this.directory.length === 1 && this.directory[0] === "root" && this.username === "root") {
+                    dir = "~";
+                }
                 else {
                     dir = this.directory[this.directory.length - 1];
                 }
@@ -121,7 +124,7 @@
         el: "#shellMessage",
         data: {
             name: "Arect Shell",
-            version: "0.10.1",
+            version: "0.11.0",
             isBeta: true,
             local: [
                 {name: "0", value: "-ArectShell"},
@@ -134,34 +137,34 @@
             ],
             fileTree: {
                 name: "/",
-                isDir: true,
+                type: "dir",
                 owner: "sys",
                 permission: ["rw", "", ""],
                 content:[{
                     name: "home",
-                    isDir: true,
+                    type: "dir",
                     owner: "sys",
                     permission: ["rwx", "rx", "rx"],
                     content: [{
                         name: "visitor",
                         owner: "visitor",
                         permission: ["rwx", "rwx", ""],
-                        isDir: true,
+                        type: "dir",
                         content: [{
                             name: "testDir",
-                            isDir: true,
+                            type: "dir",
                             owner: "visitor",
                             permission: ["rwx", "rwx", "rx"],
                             content: [{
                                 name: "second.html",
-                                isDir: false,
+                                type: "html",
                                 owner: "visitor",
                                 permission: ["rwx", "rwx", "rx"],
                                 content: ["<h1 style = \"color: #999999\">第二个文件</h1>"]
                             }]
                         }, {
                             name: "test.txt",
-                            isDir: false,
+                            type: "txt",
                             owner: "visitor",
                             permission: ["rwx", "rwx", "rx"],
                             content: ["这是test.txt", "这是test.txt的第二行"]
@@ -171,10 +174,20 @@
                     name: "hiddenfile",
                     owner: "sys",
                     permission: ["rwx", "rx", ""],
-                    isDir: false,
+                    type: "txt",
                     content: ["这是一个隐藏文件"]
+                },{
+                    name: "root",
+                    owner: "root",
+                    permission: ["rwx", "rwx", ""],
+                    type: "dir",
+                    content: []
                 }]
-            }
+            },
+            users: [
+                {name: "visitor", password: ""},
+                {name: "root", password: "arect"},
+            ]
         },
         methods: {
             getCurrentLocation: function() {
@@ -208,18 +221,18 @@
                     if (child === i) {
                         return this.fileTree;
                     }
-                    if (i.isDir) {
+                    if (i.type === "dir") {
                         list.push(i);
                     }
                 }
                 while (list.length > 0) {
                     let temp = list.shift();
-                    if (temp.isDir) {
+                    if (temp.type === "dir") {
                         for (let i of temp.content) {
                             if (i === child) {
                                 return temp;
                             }
-                            if (i.isDir) {
+                            if (i.type === "dir") {
                                 list.push(i);
                             }
                         }
@@ -228,6 +241,13 @@
                 return "ERR_CANNOT_FIND_FATHER";
             },
             getUserDir: function() {
+                if (prompt.username === "root") {
+                    for (let i of this.fileTree.content) {
+                        if (i.name === "root") {
+                            return i;
+                        }
+                    }
+                }
                 for (let i of this.fileTree.content) {
                     if (i.name === "home") {
                         for (let ii of i.content) {
@@ -244,6 +264,9 @@
                 if (Object.prototype.toString.call(arr) === "[object String]") {
                     if (arr.substr(0, 1) === "/") {
                         mark = true;
+                        if (arr === "/") {
+                            return this.fileTree;
+                        }
                     }
                     arr = arr.trim().replace(new RegExp('^\\/+|\\/+$', 'g'), '').split("/");
                 }
@@ -267,16 +290,16 @@
                 }
                 for (let i of arr) {
                     found = false;
+                    if (i === ".") {
+                        found = true;
+                        continue;
+                    }
+                    if (i === "..") {
+                        found = true;
+                        nowLoc = this.findFather(nowLoc);
+                        continue;
+                    }
                     for (let ii of nowLoc.content) {
-                        if (i === ".") {
-                            found = true;
-                            break;
-                        }
-                        if (i === "..") {
-                            found = true;
-                            nowLoc = this.findFather(nowLoc);
-                            break;
-                        }
                         if (i === ii.name) {
                             nowLoc = ii;
                             found = true;
@@ -296,16 +319,16 @@
                     found = true;
                     for (let i of arr) {
                         found = false;
+                        if (i === ".") {
+                            found = true;
+                            continue;
+                        }
+                        if (i === "..") {
+                            found = true;
+                            nowLoc = this.findFather(nowLoc);
+                            continue;
+                        }
                         for (let ii of nowLoc.content) {
-                            if (i === ".") {
-                                found = true;
-                                break;
-                            }
-                            if (i === "..") {
-                                found = true;
-                                nowLoc = this.findFather(nowLoc);
-                                break;
-                            }
                             if (i === ii.name) {
                                 nowLoc = ii;
                                 found = true;
@@ -325,7 +348,7 @@
             permission: function (file) {
                 let i;
                 if (prompt.username === "root") {
-                    i = 0;
+                    i = 1;
                 }else if (prompt.username === file.owner) {
                     i = 1;
                 }else i = 2;
@@ -357,7 +380,8 @@
                 {name: "mkdir", variable: c_mkdir},
                 {name: "screenfetch", variable: c_screenfetch},
                 {name: "shutdown", variable: c_shutdown},
-                {name: "template", variable: template}
+                {name: "su", variable: c_su},
+                {name: "template", variable: template},
             ],
             commandAmount: commandHistory.commands.length
         },

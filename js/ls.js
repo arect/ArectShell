@@ -11,7 +11,7 @@ let c_ls = new Vue({
                     let temp = shell.getCurrentLocation();
                     let tempStr = ""
                     for (let i of temp.content) {
-                        if (i.isDir === true) {
+                        if (i.type === "dir") {
                             tempStr += "<div class = \"helpItem ls_dir\">" + i.name + "</div>";
                         }
                         else {
@@ -36,7 +36,7 @@ let c_ls = new Vue({
                             result.push({isHtml: false, result: "ls: no such file or directory: " + arr[i]});
                             continue;
                         }
-                        if (!temp.isDir) {
+                        if (temp.type  !== "dir") {
                             result.push({isHtml: true, result: temp.name});
                             continue;
                         }
@@ -44,7 +44,7 @@ let c_ls = new Vue({
                             tempStr += arr[i] + ":<br />";
                         }
                         for (let ii of temp.content) {
-                            if (ii.isDir === true) {
+                            if (ii.type === "dir") {
                                 tempStr += "<div class = \"helpItem ls_dir\">" + ii.name + "</div>";
                             }
                             else {
