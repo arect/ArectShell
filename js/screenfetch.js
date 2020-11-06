@@ -35,7 +35,9 @@ let c_screenfetch = new Vue({
             temp += "Kernel:&ensp;" + this.getBrowser() + "<br />";
             temp += "Uptime:&ensp;" + this.uptime + "<br />";
             temp += "Shell:&ensp;" + shell.name + "-" + shell.version + "<br />";
-            temp += "Project url:&ensp;<a href = " + this.url + ">" + this.url + "</a><br /></div>";
+            temp += "Project url:&ensp;<a href = " + this.url + ">" + this.url + "</a><br />";
+            temp += "Power by Javascript & Vue<br />";
+            temp += "Made with 💖<br /></div>";
             return [{isHtml: true, result: temp}];
         },
         // 吕化冬 https://blog.csdn.net/weixin_40656367/article/details/82908714
