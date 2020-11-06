@@ -21,6 +21,7 @@
 |mkdir||
 |screenfetch||
 |shutdown|只是定向到空白页面|
+|su|可切换为root或visitor|
 
 ## 已知问题
 
@@ -50,7 +51,16 @@ document.write("<script type='text/javascript' src='[YOUR FILE]'></script>");
 {name: "template", variable: template}
 ```
 
----
+### 提供的函数
+
+1. `prompt.getFullDir()`可以获得一个完整的字符串形式的路径，例如"/home/visitor"；
+2. `shell.fileTree`为文件树；
+3. `shell.getCurrentLocation()`可以获得当前目录的指针；
+4. `shell.findFather(dir)`可以获得dir文件的父文件夹指针；
+5. `shell.getUserDir()` 可以获得当前用户目录的指针；
+6. `shell.enterTargetDir(path)`可以获得指定path的文件指针，可以是字符串形式也可以是字符串数组形式，例如："/home/visitor"或`["home", "visitor"]`。
+
+*出于个人习惯，将“引用“称呼为“指针”。*
 
 ## 下一步
 
