@@ -34,9 +34,9 @@ let c_screenfetch = new Vue({
             temp += "OS:&ensp;" + this.os + "<br />";
             temp += "Kernel:&ensp;" + this.getBrowser() + "<br />";
             temp += "Uptime:&ensp;" + this.uptime + "<br />";
-            temp += "Shell:&ensp;" + shell.name + "-" + shell.version + "<br />";
+            temp += "Shell:&ensp;" + shell.name + "&ensp;-" + shell.version + "&ensp;<span v-if = \"isBeta\" style = \"color: #FF9800\">beta</span>" + "<br />";
             temp += "Project url:&ensp;<a href = " + this.url + ">" + this.url + "</a><br />";
-            temp += "Powered by Javascript & Vue<br />";
+            temp += "Powered by <span style='color: #ffc107'>Javascript</span> & <span style='color: #42b983'>Vue</span><br />";
             temp += "Made with 💖<br /></div>";
             return [{isHtml: true, result: temp}];
         },

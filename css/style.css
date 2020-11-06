@@ -45,7 +45,10 @@ body {
 }
 a {
     color: grey;
+    display: inline-block;
+    position: relative;
     text-decoration: underline dotted grey;
+    transition: all 0.5s;
 }
 a:visited {
     color:grey;
@@ -53,7 +56,19 @@ a:visited {
 }
 a:hover {
     color: black;
+    padding-right: 12px;
     text-decoration: underline dotted black;
+}
+a:after {
+    content: '»';
+    position: absolute;
+    opacity: 0;
+    right: 0;
+    transition: 0.3s;
+}
+a:hover:after {
+    opacity: 1;
+    right: 0;
 }
 .ls_dir {
     color: #2196F3;
