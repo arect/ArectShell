@@ -124,7 +124,7 @@
         el: "#shellMessage",
         data: {
             name: "Arect Shell",
-            version: "0.11.1",
+            version: "0.11.2",
             isBeta: true,
             fileTree: {
                 name: "/",
@@ -297,33 +297,34 @@
                     arr.shift();
                     nowLoc = this.getUserDir();
                 }
-                for (let i of arr) {
-                    found = false;
-                    if (i === ".") {
-                        found = true;
-                        continue;
-                    }
-                    if (i === "..") {
-                        found = true;
-                        nowLoc = this.findFather(nowLoc);
-                        continue;
-                    }
-                    for (let ii of nowLoc.content) {
-                        if (i === ii.name) {
-                            nowLoc = ii;
+                if (!mark) {
+                    for (let i of arr) {
+                        found = false;
+                        if (i === ".") {
                             found = true;
+                            continue;
+                        }
+                        if (i === "..") {
+                            found = true;
+                            nowLoc = this.findFather(nowLoc);
+                            continue;
+                        }
+                        for (let ii of nowLoc.content) {
+                            if (i === ii.name) {
+                                nowLoc = ii;
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
                             break;
                         }
                     }
-                    if (!found) {
-                        break;
+                    if (found) {
+                        return nowLoc;
                     }
                 }
-                if (found) {
-                    return nowLoc;
-                }
-                // 绝对路径
-                if (mark) {
+                else {
                     nowLoc = this.fileTree;
                     found = true;
                     for (let i of arr) {
