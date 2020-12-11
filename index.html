@@ -124,40 +124,40 @@
         el: "#shellMessage",
         data: {
             name: "Arect Shell",
-            version: "0.11.2",
+            version: "0.11.3",
             isBeta: true,
             fileTree: {
                 name: "/",
                 type: "dir",
                 owner: "sys",
-                permission: ["rw", "", ""],
+                permission: ["rw", "r", ""],
                 content:[{
                     name: "home",
                     type: "dir",
                     owner: "sys",
-                    permission: ["rwx", "rx", "rx"],
+                    permission: ["rx", "rx", ""],
                     content: [{
                         name: "visitor",
                         owner: "visitor",
-                        permission: ["rwx", "rwx", ""],
+                        permission: ["rwx", "rwx", "r"],
                         type: "dir",
                         content: [{
                             name: "testDir",
                             type: "dir",
                             owner: "visitor",
-                            permission: ["rwx", "rwx", "rx"],
+                            permission: ["rwx", "rwx", "r"],
                             content: [{
                                 name: "second.html",
                                 type: "html",
                                 owner: "visitor",
-                                permission: ["rwx", "rwx", "rx"],
+                                permission: ["rwx", "rwx", "r"],
                                 content: ["<h1 style = \"color: #999999\">第二个文件</h1>"]
                             }]
                         }, {
                             name: "test.txt",
                             type: "txt",
                             owner: "visitor",
-                            permission: ["rwx", "rwx", "rx"],
+                            permission: ["rwx", "rwx", "r"],
                             content: ["这是test.txt", "这是test.txt的第二行"]
                         }]
                     }]
@@ -170,24 +170,24 @@
                 },{
                     name: "root",
                     owner: "root",
-                    permission: ["rwx", "rwx", ""],
+                    permission: ["rwx", "r", ""],
                     type: "dir",
                     content: []
                 },{
                     name: "usr",
                     owner: "sys",
-                    permission: ["rwx", "rwx", ""],
+                    permission: ["rwx", "rx", ""],
                     type: "dir",
                     content: [{
                         name: "bin",
                         owner: "sys",
-                        permission: ["rwx", "rwx", ""],
+                        permission: ["rx", "rx", ""],
                         type: "dir",
                         content: [{
-                            name: "Arect",
+                            name: "ArectShell",
                             owner: "sys",
-                            permission: ["rwx", "", ""],
-                            type: "exe",
+                            permission: ["rx", "", ""],
+                            type: "shell",
                             content: []
                         }]
                     }]
@@ -361,7 +361,7 @@
                     i = 1;
                 }else if (prompt.username === file.owner) {
                     i = 1;
-                }else i = 2;
+                }else i = 3;
                 return file.permission[i];
             }
         }
@@ -442,7 +442,8 @@
                 if (this.commandAmount >= commandHistory.commands.length) {
                     this.commandAmount = commandHistory.commands.length - 1;
                 }
-                this.$refs.command.innerHTML = commandHistory.commands[this.commandAmount];
+                this.$refs.command.innerHTML = "";
+                this.$refs.command.innerText = commandHistory.commands[this.commandAmount];
                 this.commandAmount--;
             },
             nextCommand: function () {
@@ -455,7 +456,8 @@
                 if (this.commandAmount < 0) {
                     this.commandAmount = 0;
                 }
-                this.$refs.command.innerHTML = commandHistory.commands[this.commandAmount];
+                this.$refs.command.innerHTML = "";
+                this.$refs.command.innerText = commandHistory.commands[this.commandAmount];
                 this.commandAmount++;
             }
         }
