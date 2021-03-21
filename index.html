@@ -393,13 +393,13 @@
                 {name: "su", variable: c_su},
                 {name: "template", variable: template},
             ],
-            commandAmount: commandHistory.commands.length
+            commandAmount: commandHistory.commands.length + 1
         },
         methods: {
             exec: function() {
                 // 输入一个命令按下回车，阻止产生<br />，如果有更好的办法就好了。
                 event.preventDefault();
-                this.commandAmount = commandHistory.commands.length;
+                this.commandAmount = commandHistory.commands.length + 1;
                 if (!mode.isActive) {
                     let command = this.$refs.command.innerText.trim().split(/\s+/);
                     commandHistory.prompts.push(prompt.toString_());
@@ -433,22 +433,28 @@
                 }
             },
             lastCommand: function () {
+                this.commandAmount--;
                 if (this.commandAmount < 0) {
                     this.commandAmount = 0;
                 }
                 if (commandHistory.commands.length === 0) {
                     return;
                 }
-                if (this.commandAmount >= commandHistory.commands.length) {
-                    this.commandAmount = commandHistory.commands.length - 1;
+                if (this.commandAmount > commandHistory.commands.length) {
+                    this.commandAmount = commandHistory.commands.length;
                 }
                 this.$refs.command.innerHTML = "";
+                if (this.commandAmount === commandHistory.commands.length) {
+                    this.$refs.command.innerText = "";
+                    return
+                }
+                console.log(this.commandAmount)
                 this.$refs.command.innerText = commandHistory.commands[this.commandAmount];
-                this.commandAmount--;
             },
             nextCommand: function () {
-                if (this.commandAmount >= commandHistory.commands.length) {
-                    this.commandAmount = commandHistory.commands.length - 1;
+                this.commandAmount++;
+                if (this.commandAmount > commandHistory.commands.length) {
+                    this.commandAmount = commandHistory.commands.length;
                 }
                 if (commandHistory.commands.length === 0) {
                     return;
@@ -457,8 +463,11 @@
                     this.commandAmount = 0;
                 }
                 this.$refs.command.innerHTML = "";
+                if (this.commandAmount === commandHistory.commands.length) {
+                    this.$refs.command.innerText = "";
+                    return
+                }
                 this.$refs.command.innerText = commandHistory.commands[this.commandAmount];
-                this.commandAmount++;
             }
         }
     });
