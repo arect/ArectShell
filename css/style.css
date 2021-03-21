@@ -4,16 +4,10 @@ body {
     font-family: 'Cascadia Mono Light', 'Oxygen Mono', monospace, Space Mono Regular;
 }
 .aboutMe {
-    padding-top: 12px;
-    padding-bottom: 12px;
-    padding-left: 6px;
-    padding-right: 6px;
+    padding: 12px 6px;
 }
 .introduce {
-    padding-top: 12px;
-    padding-bottom: 12px;
-    padding-left: 6px;
-    padding-right: 6px;
+    padding: 12px 6px;
     color: grey;
 }
 .commandMain {
@@ -29,7 +23,8 @@ body {
     content: "input here";
 }
 .commandFocus {
-    padding-right: 1px!important;
+    font-size: 16px;
+    padding-right: 16px!important;
     word-break: break-all;
 }
 .commandFocus:focus {
