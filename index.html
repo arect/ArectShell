@@ -124,7 +124,7 @@
         el: "#shellMessage",
         data: {
             name: "Arect Shell",
-            version: "0.14.0",
+            version: "0.14.1",
             isBeta: true,
             fileTree: {
                 name: "/",
@@ -499,10 +499,7 @@
                     return
                 }
                 if (commandHistory.commands[this.commandAmount].b === 2) {
-                    if (this.commandAmount === commandHistory.commands.length) {
-                        return
-                    }
-                    this.lastCommand()
+                    this.nextCommand()
                     return
                 }
                 this.$refs.command.innerText = commandHistory.commands[this.commandAmount].c;
