@@ -16,8 +16,8 @@ let c_help = new Vue({
         },
         help: function () {
             return [
-                {isHtml: false, result: "Usage: " + this.name + " " + this.usage},
-                {isHtml: false, result: this.description}
+                {isHtml: false, result: "Usage: help"},
+                {isHtml: false, result: "List the commands which I want you to see."}
             ];
         }
     }

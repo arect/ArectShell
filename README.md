@@ -13,6 +13,7 @@
 |cat||
 |cd||
 |clear||
+|cp|复制文件|
 |date|输出日期|
 |echo|甚至还有一些变量|
 |help|例如ls --help或者直接help|
@@ -40,7 +41,7 @@
     {isHtml: Boolen, result: String},
 ]
 ```
-`isHtml`标记这个结果是否要以HTML输出，否则输出纯文本，`result`返回纯文本。
+`isHtml`标记这个结果是否要以HTML输出，否则输出纯文本，`result`返回显示的内容。
 
 编写好js文件以后，在`main.js`中加入你的文件，在尾部添加：
 ```javascript
@@ -53,7 +54,7 @@ document.write("<script type='text/javascript' src='[YOUR FILE]'></script>");
 
 ### 提供的函数
 
-1. `prompt.getFullDir()`可以获得一个完整的字符串形式的路径，例如"/home/visitor"；
+1. `prompt.getFullDir()`可以获得所在目录完整的字符串形式的路径，例如"/home/visitor"；
 2. `shell.fileTree`为文件树；
 3. `shell.getCurrentLocation()`可以获得当前目录的指针；
 4. `shell.findFather(dir)`可以获得dir文件的父文件夹指针；

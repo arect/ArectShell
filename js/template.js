@@ -12,10 +12,11 @@ let template = new Vue({
             // ...
             result.push({isHtml: false, result: this.temp1});
             result.push({isHtml: true, result: this.temp2});
-            let str = "";
+            let str = "[";
             for (let i of arr) {
-                str += i;
+                str += "\"" + i + "\", ";
             }
+            str = str.substring(0, str.length - 2) + "]"
             result.push({isHtml: false, result: "You just input: " + str});
             return result;
         },

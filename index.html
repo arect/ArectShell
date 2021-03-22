@@ -41,7 +41,7 @@
 </header>
 <div class = "commandHistory" id = "commandHistory">
     <div v-for = "(item, index) in prompts" class = "historyItem">
-        {{ item }} {{ commands[index] }}<br />
+        {{ item }}&ensp;{{ commands[index] }}<br />
         <div v-for = "i in results[index]">
             <div v-if = "i.isHtml" v-html = "i.result"></div>
             <div v-else v-text = "i.result"></div>
@@ -123,7 +123,7 @@
         el: "#shellMessage",
         data: {
             name: "Arect Shell",
-            version: "0.11.4",
+            version: "0.12.0",
             isBeta: true,
             fileTree: {
                 name: "/",
@@ -381,6 +381,7 @@
                 {name: "cat", variable: c_cat},
                 {name: "cd", variable: c_cd},
                 {name: "clear", variable: c_clear},
+                {name: "cp", variable: c_cp},
                 {name: "date", variable: c_date},
                 {name: "echo", variable: c_echo},
                 {name: "help", variable: c_help},
@@ -469,6 +470,5 @@
             }
         }
     });
-    
 </script>
 </html>

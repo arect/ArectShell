@@ -1,6 +1,7 @@
 document.write("<script type='text/javascript' src='./js/cat.js'></script>");
 document.write("<script type='text/javascript' src='./js/cd.js'></script>");
 document.write("<script type='text/javascript' src='./js/clear.js'></script>");
+document.write("<script type='text/javascript' src='./js/cp.js'></script>");
 document.write("<script type='text/javascript' src='./js/date.js'></script>");
 document.write("<script type='text/javascript' src='./js/echo.js'></script>");
 document.write("<script type='text/javascript' src='./js/mkdir.js'></script>");
