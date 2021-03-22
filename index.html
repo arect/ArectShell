@@ -124,7 +124,7 @@
         el: "#shellMessage",
         data: {
             name: "Arect Shell",
-            version: "0.13.0",
+            version: "0.13.1",
             isBeta: true,
             fileTree: {
                 name: "/",
@@ -405,9 +405,15 @@
                     this.commandAmount = commandHistory.commands.length + 1;
                     let command = this.$refs.command.innerText.trim().split(/\s+/);
                     commandHistory.prompts.push(prompt.toString());
-                    commandHistory.commands.push({c: this.$refs.command.innerText, b: 1});
-                    this.select(command);
-                    this.$refs.command.innerHTML = "";
+                    if (command.length === 1 && command[0] === "") {
+                        commandHistory.commands.push({c: "", b: 2});
+                        commandHistory.results.push("");
+                    }
+                    else {
+                        commandHistory.commands.push({c: this.$refs.command.innerText, b: 1});
+                        this.select(command);
+                        this.$refs.command.innerHTML = "";
+                    }
                 }
                 else {
                     commandHistory.prompts.push(prompt.toString());
@@ -462,6 +468,9 @@
                     return
                 }
                 if (commandHistory.commands[this.commandAmount].b === 2) {
+                    if (this.commandAmount === 0) {
+                        return
+                    }
                     this.lastCommand()
                     return
                 }
@@ -484,6 +493,9 @@
                     return
                 }
                 if (commandHistory.commands[this.commandAmount].b === 2) {
+                    if (this.commandAmount === commandHistory.commands.length) {
+                        return
+                    }
                     this.lastCommand()
                     return
                 }
