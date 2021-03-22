@@ -41,7 +41,7 @@
 </header>
 <div class = "commandHistory" id = "commandHistory">
     <div v-for = "(item, index) in prompts" class = "historyItem">
-        {{ item }}&ensp;{{ commands[index] }}<br />
+        {{ item }}&ensp;{{ commands[index].c }}<br />
         <div v-for = "i in results[index]">
             <div v-if = "i.isHtml" v-html = "i.result"></div>
             <div v-else v-text = "i.result"></div>
@@ -405,13 +405,13 @@
                     this.commandAmount = commandHistory.commands.length + 1;
                     let command = this.$refs.command.innerText.trim().split(/\s+/);
                     commandHistory.prompts.push(prompt.toString());
-                    commandHistory.commands.push(this.$refs.command.innerText);
+                    commandHistory.commands.push({c: this.$refs.command.innerText, b: 1});
                     this.select(command);
                     this.$refs.command.innerHTML = "";
                 }
                 else {
                     commandHistory.prompts.push(prompt.toString());
-                    commandHistory.commands.push("");
+                    commandHistory.commands.push({c: "", b: 2});
                     commandHistory.results.push(c_sudo.main(this.$refs.command.innerText.trim().split(/\s+/)));
                     this.$refs.command.innerHTML = "";
                 }
@@ -461,7 +461,11 @@
                     this.$refs.command.innerText = "";
                     return
                 }
-                this.$refs.command.innerText = commandHistory.commands[this.commandAmount];
+                if (commandHistory.commands[this.commandAmount].b === 2) {
+                    this.lastCommand()
+                    return
+                }
+                this.$refs.command.innerText = commandHistory.commands[this.commandAmount].c;
             },
             nextCommand: function () {
                 this.commandAmount++;
@@ -479,7 +483,11 @@
                     this.$refs.command.innerText = "";
                     return
                 }
-                this.$refs.command.innerText = commandHistory.commands[this.commandAmount];
+                if (commandHistory.commands[this.commandAmount].b === 2) {
+                    this.lastCommand()
+                    return
+                }
+                this.$refs.command.innerText = commandHistory.commands[this.commandAmount].c;
             }
         }
     });
