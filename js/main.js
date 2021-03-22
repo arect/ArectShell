@@ -12,4 +12,5 @@ document.write("<script type='text/javascript' src='./js/rm.js'></script>");
 document.write("<script type='text/javascript' src='./js/screenfetch.js'></script>");
 document.write("<script type='text/javascript' src='./js/shutdown.js'></script>");
 document.write("<script type='text/javascript' src='./js/su.js'></script>");
+document.write("<script type='text/javascript' src='./js/sudo.js'></script>");
 document.write("<script type='text/javascript' src='./js/template.js'></script>");

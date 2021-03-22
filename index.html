@@ -50,7 +50,7 @@
 </div>
 <div class = "commandMain">
     <div id = "commandInput" spellcheck = "false" autocomplete = "off">
-        <span id = "prompt" v-text = "toString_()"></span>&ensp;<span
+        <span id = "prompt" v-text = "toString()"></span>&ensp;<span
                 contenteditable = "true"
                 id = "inputCommand"
                 v-bind:class = "{ commandInput: !isFocused, commandFocus: isFocused }"
@@ -68,6 +68,7 @@
 <script>
     let mode = new Vue({
         data: {
+            isActive: false,
             sign: "",
             content: "",
         },
@@ -91,8 +92,8 @@
             authority: "$"
         },
         methods: {
-            toString_: function() {
-                if (mode.sign !== "") {
+            toString: function() {
+                if (mode.isActive) {
                     return mode.content;
                 }
                 let dir;
@@ -108,7 +109,7 @@
                 else {
                     dir = this.directory[this.directory.length - 1];
                 }
-                return this.toString = "[" + this.username + "@" + this.device + " " + dir + "] " + this.authority;
+                return "[" + this.username + "@" + this.device + " " + dir + "] " + this.authority;
             },
             getFullDir: function () {
                 let temp = "";
@@ -400,16 +401,27 @@
             exec: function() {
                 // 输入一个命令按下回车，阻止产生<br />，如果有更好的办法就好了。
                 event.preventDefault();
-                this.commandAmount = commandHistory.commands.length + 1;
                 if (!mode.isActive) {
+                    this.commandAmount = commandHistory.commands.length + 1;
                     let command = this.$refs.command.innerText.trim().split(/\s+/);
-                    commandHistory.prompts.push(prompt.toString_());
+                    commandHistory.prompts.push(prompt.toString());
                     commandHistory.commands.push(this.$refs.command.innerText);
                     this.select(command);
                     this.$refs.command.innerHTML = "";
                 }
+                else {
+                    commandHistory.prompts.push(prompt.toString());
+                    commandHistory.commands.push("");
+                    commandHistory.results.push(c_sudo.main(this.$refs.command.innerText.trim().split(/\s+/)));
+                    this.$refs.command.innerHTML = "";
+                }
             },
             select: function(command) {
+                if (command[0] === "sudo") {
+                    mode.sudo()
+                    commandHistory.results.push("");
+                    return
+                }
                 for (let i of this.command) {
                     if (command[0] === i.name) {
                         if (command.length > 1) {
