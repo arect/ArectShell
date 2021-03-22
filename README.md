@@ -13,13 +13,14 @@
 |cat||
 |cd||
 |clear||
-|cp|复制文件|
+|cp||
 |date|输出日期|
 |echo|甚至还有一些变量|
 |help|例如ls --help或者直接help|
 |html|类似于cat只不过是以html的形式输出|
 |ls||
 |mkdir||
+|rm||
 |screenfetch||
 |shutdown|只是定向到空白页面|
 |su|可切换为root或visitor|
