@@ -124,7 +124,7 @@
         el: "#shellMessage",
         data: {
             name: "Arect Shell",
-            version: "0.13.1",
+            version: "0.14.0",
             isBeta: true,
             fileTree: {
                 name: "/",
@@ -357,7 +357,7 @@
             },
             permission: function (file) {
                 let i;
-                if (prompt.username === "root") {
+                if (prompt.username === "root" || mode.sign === "root") {
                     i = 0;
                 }else if (prompt.username === file.owner) {
                     i = 0;
@@ -418,13 +418,19 @@
                 else {
                     commandHistory.prompts.push(prompt.toString());
                     commandHistory.commands.push({c: "", b: 2});
-                    commandHistory.results.push(c_sudo.main(this.$refs.command.innerText.trim().split(/\s+/)));
+                    c_sudo.main(this.$refs.command.innerText);
                     this.$refs.command.innerHTML = "";
                 }
             },
             select: function(command) {
                 if (command[0] === "sudo") {
+                    if (mode.sign === "root") {
+                        c_sudo.command = command
+                        c_sudo.main()
+                        return
+                    }
                     mode.sudo()
+                    c_sudo.command = command
                     commandHistory.results.push("");
                     return
                 }
