@@ -124,7 +124,7 @@
         el: "#shellMessage",
         data: {
             name: "Arect Shell",
-            version: "0.14.1",
+            version: "0.14.2",
             isBeta: true,
             fileTree: {
                 name: "/",
@@ -424,6 +424,10 @@
             },
             select: function(command) {
                 if (command[0] === "sudo") {
+                    if (command.length === 1) {
+                        commandHistory.results.push([{isHtml: false, result: "Usage: sudo [COMMAND]"}]);
+                        return
+                    }
                     if (mode.sign === "root") {
                         c_sudo.command = command
                         c_sudo.main()
@@ -431,7 +435,7 @@
                     }
                     mode.sudo()
                     c_sudo.command = command
-                    commandHistory.results.push("");
+                    commandHistory.results.push([{isHtml: false, result: ""}]);
                     return
                 }
                 for (let i of this.command) {
