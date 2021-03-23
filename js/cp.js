@@ -15,7 +15,7 @@ let c_cp = new Vue({
                 }
                 case 3: {
                     // 获取被复制的文件指针
-                    const file = shell.enterTargetDir(arr[1])
+                    let file = shell.enterTargetDir(arr[1])
                     // 无效路径
                     if (Object.prototype.toString.call(file) === "[object String]") {
                         return [{isHtml: false, result: "cp: cannot stat \'" + arr[1] + "\': No such file or directory"}]
@@ -26,6 +26,8 @@ let c_cp = new Vue({
                     }
                     // 获得目标文件夹指针
                     let dir = shell.enterTargetDir(arr[2])
+                    // return [{isHtml: false, result: "test"}]
+                    console.log(dir)
                     // 复制后文件名
                     let _name = ""
                     // 深拷贝文件
@@ -69,15 +71,19 @@ let c_cp = new Vue({
                     if (shell.permission(dir).indexOf("w") !== -1) {
                         // 如果路径为文件夹
                         if (dir.type === "dir") {
-                            for (let i of dir.content) {
+                            for (let i = 0; i < dir.content.length; i++) {
                                 // 如果目标目录有同名文件，则覆盖
-                                if (i.name === temp.name) {
+                                if (dir.content[i].name === temp.name) {
+                                    // 如果是同文件
+                                    if (dir.content[i] === file) {
+                                        return [{isHtml: false, result: "cp: '" + arr[1] + "' and '" + fullPath + "' are the same file"}]
+                                    }
                                     // 覆盖
-                                    dir.name = _name
-                                    dir.type = temp.type
-                                    dir.content = temp.content
-                                    dir.owner = temp.owner
-                                    dir.permission = temp.permission
+                                    dir.content[i].name = _name
+                                    dir.content[i].type = temp.type
+                                    dir.content[i].content = temp.content
+                                    dir.content[i].owner = temp.owner
+                                    dir.content[i].permission = temp.permission
                                     break
                                 }
                             }
@@ -87,7 +93,7 @@ let c_cp = new Vue({
                         else {
                             // 如果是同文件
                             if (file === dir) {
-                                return [{isHtml: false, result: "cp: '" + arr[1] + "' and '" + arr[2] + "' are the same file"}]
+                                return [{isHtml: false, result: "cp: '" + arr[1] + "' and '" + fullPath + "' are the same file"}]
                             }
                             // 覆盖
                             dir.name = _name

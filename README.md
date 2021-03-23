@@ -20,6 +20,7 @@
 |html|类似于cat只不过是以html的形式输出|
 |ls||
 |mkdir||
+|pft|输出文件树|
 |rm||
 |screenfetch||
 |shutdown|只是定向到空白页面|
