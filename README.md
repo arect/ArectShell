@@ -4,6 +4,8 @@
 
 启发于[Axton: About Me]( https://axton.cc/ )，于是打算自己也做一个。
 
+demo: [shell.kanofans.com]( https://shell.kanofans.com/ )
+
 正在持续制作中。
 
 ## 已实现的命令
