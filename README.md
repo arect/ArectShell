@@ -1,12 +1,12 @@
 # ArectShell
 
+新项目：[github.com/arect/arect_shell]( https://github.com/arect/arect_shell )
+
 一个用前端模拟的控制台网页。
 
 启发于[Axton: About Me]( https://axton.cc/ )，于是打算自己也做一个。
 
-demo: [shell.kanofans.com]( https://shell.kanofans.com/ )
-
-正在持续制作中。
+~~demo: [shell.kanofans.com]( https://shell.kanofans.com/ )~~
 
 ## 已实现的命令
 
@@ -35,6 +35,7 @@ demo: [shell.kanofans.com]( https://shell.kanofans.com/ )
 
 > 目前已经知道了为什么点击input here后光标失焦的原因，但是由于历史遗留问题比较…懒得改，demo上的用暴力方法改成正常的了，代价是每次点击都会爆栈两次（诶嘿嘿。
 > 至于为什么懒得修…是因为目前正在重构这个项目，用vue…效果好很多…过段时间就发。
+> (原因大概是已经聚焦了所以js再聚焦会出现问题（？）
 
 ## 开发
 
